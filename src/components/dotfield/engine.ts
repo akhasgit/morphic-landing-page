@@ -252,13 +252,13 @@ export class DotFieldEngine {
       const ny = (y - H / 2) / (H / 2);
       const d = Math.sqrt(nx * nx * 0.8 + ny * ny * 0.9);
       let a = kind[i] ? 1 : 1 - smoothstep(0.62, 1.22, d) * 0.92;
-      if (!kind[i]) {
-        for (const r of this.textSafe) {
-          const dx = Math.max(r.x - x, 0, x - (r.x + r.w));
-          const dy = Math.max(r.y - y, 0, y - (r.y + r.h));
-          const f = smoothstep(0, 56, Math.hypot(dx, dy));
-          a *= safe + (1 - safe) * f;
-        }
+      // Formation dots (the M) dim less behind text so the shape still reads.
+      const s = kind[i] ? Math.max(safe, 0.55) : safe;
+      for (const r of this.textSafe) {
+        const dx = Math.max(r.x - x, 0, x - (r.x + r.w));
+        const dy = Math.max(r.y - y, 0, y - (r.y + r.h));
+        const f = smoothstep(0, 56, Math.hypot(dx, dy));
+        a *= s + (1 - s) * f;
       }
       this.alpha[i] = a;
     }

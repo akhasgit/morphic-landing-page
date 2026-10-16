@@ -23,13 +23,13 @@ type Props = {
   /** utm_medium + analytics `tile` */
   tile: string;
   size?: "lg" | "md" | "sm";
+  variant?: "primary" | "ghost";
   short?: boolean;
   sweep?: boolean;
   className?: string;
   style?: CSSProperties;
   icon?: ReactNode;
   onPointerEnter?: PointerEventHandler<HTMLElement>;
-  /** Mobile behaviour: open the email sheet (default) — dock/hero all use this. */
 };
 
 /**
@@ -37,11 +37,11 @@ type Props = {
  * "Get Morphic for Chrome" with a tooltip; mobile/tablet → "Get the link" email sheet.
  * All label variants sit in one grid cell so swapping after hydration never shifts layout.
  */
-export function InstallButton({ tile, size = "lg", short, sweep, className = "", style, icon, onPointerEnter }: Props) {
+export function InstallButton({ tile, size = "lg", variant = "primary", short, sweep, className = "", style, icon, onPointerEnter }: Props) {
   const kind = useBrowserKind();
   const openEmail = useUi((s) => s.openEmail);
   const labels = short ? SHORT : FULL;
-  const cls = `btn btn-primary btn-${size} ${sweep ? "btn-sweep" : ""} ${className}`;
+  const cls = `btn btn-${variant} btn-${size} ${sweep ? "btn-sweep" : ""} ${className}`;
 
   const label = (
     <span className="grid">

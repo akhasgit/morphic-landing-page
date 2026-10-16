@@ -1,0 +1,66 @@
+/* Slim site footer (§7.9) */
+
+.site-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.site-footer-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 22px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.site-footer-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--ink);
+}
+.site-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+}
+.site-footer-links a,
+.site-footer-note a {
+  color: var(--ink-2);
+  transition: color 150ms;
+}
+.site-footer-links a:hover,
+.site-footer-note a:hover {
+  color: var(--ink);
+}
+.site-footer-copy {
+  margin-left: auto;
+}
+.site-footer-note {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+@media (max-width: 1023px) {
+  .site-footer {
+    font-size: 12px;
+  }
+  .site-footer-row {
+    gap: 6px 14px;
+    padding-top: 10px;
+  }
+  .site-footer-links {
+    gap: 4px 12px;
+  }
+  .site-footer-copy {
+    margin-left: 0;
+  }
+  .site-footer-note {
+    font-size: 11px;
+  }
+}

@@ -1,0 +1,148 @@
+/* ───────── Tile 09 — Get Morphic (§7.9) ───────── */
+
+.gm-content {
+  z-index: 1;
+  align-items: center;
+  padding-bottom: 0;
+}
+/* The H2 sits over the lower third of the dotted M (centered at 34.5%, ≤380px tall). */
+.gm-stack {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(34.5% + min(190px, 21vh) * 0.42);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  pointer-events: none;
+}
+.gm-stack > * {
+  pointer-events: auto;
+}
+.gm-h2 {
+  max-width: 15em;
+  color: #fff;
+  text-shadow: 0 2px 24px rgba(11, 16, 32, 0.85);
+}
+.gm-cta {
+  margin-top: clamp(16px, 3vh, 26px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.gm-cta-btn {
+  position: relative;
+  display: inline-flex;
+  border-radius: var(--radius-btn);
+}
+.gm-cta-btn[data-pulse]::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: calc(var(--radius-btn) + 4px);
+  border: 2px solid rgba(165, 180, 252, 0.9);
+  animation: gm-pulse 1.1s var(--ease-out) 2;
+  pointer-events: none;
+}
+@keyframes gm-pulse {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.18);
+  }
+}
+.gm-micro {
+  margin-top: 10px;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+.gm-idea {
+  margin-top: clamp(16px, 3vh, 28px);
+  width: min(520px, 100%);
+}
+
+/* Styled exactly like the side panel's composer */
+.gm-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 14px;
+  background: rgba(15, 15, 18, 0.72);
+  border: 1px solid #2b2b33;
+  box-shadow:
+    0 20px 60px -24px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+.gm-picker,
+.gm-send {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+}
+.gm-picker {
+  background: #232329;
+  border: 1px solid #2b2b33;
+  color: #8a8a96;
+}
+.gm-field {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 9px;
+  background: #18181c;
+  border: 1px solid #2b2b33;
+  color: var(--text);
+  font: inherit;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 150ms;
+}
+.gm-field::placeholder {
+  color: #8a8a96;
+}
+.gm-field:focus {
+  border-color: var(--accent);
+}
+.gm-send {
+  border: 0;
+  background: var(--accent);
+  color: #fff;
+  transition: background-color 150ms;
+}
+.gm-send:hover {
+  background: var(--accent-hover);
+}
+
+/* Footer pinned to the bottom of the tile */
+.gm-footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: max(14px, env(safe-area-inset-bottom));
+}
+
+@media (max-width: 1023px) {
+  .gm-stack {
+    top: calc(25% + min(23vw, 11vh) * 0.42);
+  }
+  .gm-h2 {
+    font-size: clamp(27px, 7.6vw, 32px);
+  }
+  .gm-idea {
+    width: 100%;
+  }
+  .gm-footer {
+    bottom: calc(max(12px, env(safe-area-inset-bottom)) + 66px);
+  }
+}

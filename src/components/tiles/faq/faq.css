@@ -1,0 +1,146 @@
+/* ───────── Tile 08 — FAQ (§7.8) ───────── */
+
+.faq-content {
+  justify-content: center;
+}
+.faq-h2 {
+  flex: none;
+}
+.faq-cols {
+  margin-top: clamp(20px, 4vh, 40px);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 40px;
+  align-items: start;
+}
+.faq-col {
+  display: flex;
+  flex-direction: column;
+}
+.faq-item {
+  border-bottom: 1px solid var(--border);
+}
+.faq-item:first-child {
+  border-top: 1px solid var(--border);
+}
+.faq-item h3 {
+  margin: 0;
+}
+.faq-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: clamp(14px, 2.4vh, 20px) 0;
+  border: 0;
+  background: none;
+  text-align: left;
+  font-family: var(--font-display);
+  font-size: clamp(16px, min(1.3vw, 2.5vh), 19px);
+  font-weight: 550;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  transition: color 150ms;
+}
+.faq-trigger:hover {
+  color: #fff;
+}
+.faq-chev {
+  flex: none;
+  color: var(--ink-2);
+  transition: transform 300ms var(--ease-out);
+}
+.faq-trigger[data-state="open"] .faq-chev {
+  transform: rotate(180deg);
+  color: var(--accent-hover);
+}
+.faq-content {
+  overflow: hidden;
+}
+.faq-content[data-state="open"] {
+  animation: faq-open 320ms var(--ease-out);
+}
+.faq-content[data-state="closed"] {
+  animation: faq-close 240ms var(--ease-out);
+}
+@keyframes faq-open {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+    opacity: 1;
+  }
+}
+@keyframes faq-close {
+  from {
+    height: var(--radix-accordion-content-height);
+    opacity: 1;
+  }
+  to {
+    height: 0;
+    opacity: 0;
+  }
+}
+.faq-answer {
+  padding: 0 32px clamp(14px, 2.4vh, 20px) 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 36em;
+}
+
+.faq-list {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  .faq-content {
+    justify-content: flex-start;
+  }
+  .faq-cols {
+    display: none;
+  }
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    margin-top: 18px;
+  }
+  .faq-list li {
+    border-bottom: 1px solid var(--border);
+  }
+  .faq-list li:first-child {
+    border-top: 1px solid var(--border);
+  }
+  .faq-list-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 13px 0;
+    border: 0;
+    background: none;
+    text-align: left;
+    font-size: 15.5px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .faq-list-btn svg {
+    flex: none;
+    color: var(--ink-3);
+  }
+}
+@media (max-width: 1023px) and (max-height: 760px) {
+  .faq-list-btn {
+    padding: 10px 0;
+    font-size: 14.5px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .faq-content[data-state] {
+    animation-duration: 1ms;
+  }
+}

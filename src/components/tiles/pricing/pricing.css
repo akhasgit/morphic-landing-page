@@ -1,0 +1,424 @@
+/* ───────── Tile 07 — Pricing (§7.7) ───────── */
+
+.pr-content {
+  align-items: center;
+  justify-content: center;
+}
+.pr-head {
+  flex: none;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.pr-h2 {
+  margin-top: 12px;
+}
+.pr-sub {
+  margin-top: 10px;
+  max-width: 44em;
+  font-size: clamp(14.5px, min(1.15vw, 2.2vh), 16.5px);
+  color: var(--ink-2);
+}
+.pr {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Monthly / Yearly */
+.pr-toggle {
+  margin-top: clamp(14px, 2.6vh, 24px);
+  display: inline-flex;
+  padding: 4px;
+  border-radius: 9999px;
+  background: #fff;
+  border: 1px solid var(--light-border);
+  box-shadow: 0 1px 2px rgba(30, 16, 80, 0.05);
+}
+.pr-toggle-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 16px;
+  border: 0;
+  background: none;
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 550;
+  color: var(--ink-2);
+}
+.pr-toggle-btn[aria-checked="true"] {
+  color: #fff;
+}
+.pr-toggle-pill {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: var(--light-text);
+}
+.pr-save {
+  position: relative;
+  font-size: 11px;
+  font-weight: 650;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  background: rgba(74, 222, 128, 0.18);
+  color: #15803d;
+}
+.pr-toggle-btn[aria-checked="true"] .pr-save {
+  background: rgba(74, 222, 128, 0.22);
+  color: #86efac;
+}
+
+/* Cards */
+.pr-cards {
+  margin-top: clamp(18px, 3.6vh, 34px);
+  width: 100%;
+  max-width: 1060px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+.plan {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(18px, 3vh, 26px);
+  border-radius: var(--radius-card);
+  background: var(--light-surface);
+  border: 1px solid var(--light-border);
+  color: var(--ink);
+  box-shadow: 0 1px 2px rgba(30, 16, 80, 0.04);
+}
+.plan-pro {
+  transform: translateY(-12px);
+  background: var(--bg);
+  border-color: transparent;
+  box-shadow: 0 30px 60px -28px rgba(46, 16, 101, 0.6);
+}
+[data-revealed="true"] .plan-pro.reveal {
+  transform: translateY(-12px);
+}
+[data-revealed="false"] .plan-pro.reveal {
+  transform: translateY(4px);
+}
+
+/* Slowly rotating brand-gradient border on Pro (conic, 8s) */
+@property --pro-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+.plan-pro::before {
+  content: "";
+  position: absolute;
+  inset: -1.5px;
+  border-radius: calc(var(--radius-card) + 1.5px);
+  padding: 1.5px;
+  background: conic-gradient(from var(--pro-angle), #2e1065, #6d28d9, #a78bfa, #6d28d9, #2e1065);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  animation: pro-spin 8s linear infinite;
+  pointer-events: none;
+}
+@keyframes pro-spin {
+  to {
+    --pro-angle: 360deg;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .plan-pro::before {
+    animation: none;
+  }
+}
+.plan-popular {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  translate: -50% 0;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background: var(--brand-gradient);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 6px 18px -6px rgba(109, 40, 217, 0.7);
+}
+.plan-name {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+.plan-line {
+  margin-top: 4px;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+.plan-price {
+  margin-top: clamp(12px, 2.2vh, 18px);
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+.roll {
+  display: inline-flex;
+  align-items: baseline;
+  font-family: var(--font-display);
+  font-size: clamp(36px, min(3.2vw, 6vh), 46px);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.roll-digits {
+  display: inline-flex;
+}
+.roll-col {
+  display: inline-block;
+  height: 1em;
+  overflow: hidden;
+  line-height: 1;
+}
+.roll-strip {
+  display: flex;
+  flex-direction: column;
+}
+.roll-strip > span {
+  height: 1em;
+  line-height: 1;
+}
+.plan-per {
+  font-size: 15px;
+  color: var(--ink-2);
+}
+.plan-sub {
+  margin-top: 6px;
+  min-height: 1.4em;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.plan-cta {
+  margin-top: clamp(14px, 2.4vh, 20px);
+}
+.plan-note {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--ink-2);
+  text-align: center;
+}
+.plan-includes {
+  margin-top: clamp(14px, 2.4vh, 20px);
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  font-size: 14px;
+  color: var(--ink);
+}
+.plan-includes li {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+}
+.plan-includes svg {
+  flex: none;
+  margin-top: 3px;
+  color: var(--accent);
+}
+.plan-pro .plan-includes svg {
+  color: var(--accent-hover);
+}
+
+.pr-foot {
+  margin-top: clamp(16px, 3vh, 26px);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 18px;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+.pr-compare {
+  border: 0;
+  background: none;
+  padding: 0;
+  font-weight: 600;
+  color: var(--eyebrow);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.pr-team-link {
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Social proof marquee (only when site.socialProof has entries) */
+.pr-marquee {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 14px;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+}
+.pr-marquee-track {
+  display: flex;
+  gap: 40px;
+  width: max-content;
+  animation: marquee 60s linear infinite;
+}
+.pr-quote {
+  margin: 0;
+  display: flex;
+  gap: 8px;
+  font-size: 13.5px;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.pr-quote blockquote {
+  margin: 0;
+  color: var(--ink);
+}
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pr-marquee-track {
+    animation: none;
+  }
+}
+
+/* Compare dialog */
+.pr-dialog {
+  position: fixed;
+  z-index: 91;
+  inset: 0;
+  margin: auto;
+  width: min(760px, 94vw);
+  height: max-content;
+  max-height: 90dvh;
+  overflow: auto;
+  padding: 26px;
+  border-radius: 22px;
+  background: #fff;
+  border: 1px solid var(--light-border);
+  box-shadow: 0 40px 100px -30px rgba(30, 16, 80, 0.45);
+  color: var(--light-text);
+}
+.pr-dialog-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 9999px;
+  border: 1px solid var(--light-border);
+  background: #fff;
+  color: var(--light-text);
+}
+.pr-table-wrap {
+  margin-top: 18px;
+  overflow-x: auto;
+}
+.pr-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.pr-table th,
+.pr-table td {
+  padding: 11px 12px;
+  border-bottom: 1px solid #f0f0f2;
+  text-align: center;
+}
+.pr-table thead th {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+}
+.pr-table tbody th {
+  text-align: left;
+  font-weight: 500;
+  color: var(--light-text-2);
+}
+.pr-table [data-pro] {
+  background: rgba(99, 102, 241, 0.05);
+}
+.pr-yes {
+  display: inline-block;
+  color: var(--accent);
+}
+.pr-no {
+  color: #a1a1aa;
+}
+
+@media (max-width: 1023px) {
+  .pr-content {
+    justify-content: flex-start;
+  }
+  .pr-head {
+    align-items: flex-start;
+    text-align: left;
+    width: 100%;
+  }
+  .pr-sub {
+    font-size: 14px;
+  }
+  .pr {
+    align-items: flex-start;
+  }
+  .pr-toggle {
+    margin-top: 14px;
+  }
+  .pr-cards {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    margin-top: 26px;
+    padding: 14px var(--gutter) 6px;
+    margin-inline: calc(var(--gutter) * -1);
+    width: calc(100% + var(--gutter) * 2);
+    max-width: none;
+    align-items: stretch;
+  }
+  .plan {
+    flex: none;
+    width: 76vw;
+    max-width: 340px;
+    scroll-snap-align: center;
+    padding: 18px;
+  }
+  .plan-pro,
+  [data-revealed="true"] .plan-pro.reveal {
+    transform: none;
+  }
+  .plan-includes {
+    gap: 7px;
+    font-size: 13.5px;
+  }
+  .pr-foot {
+    justify-content: flex-start;
+    gap: 6px 14px;
+    font-size: 12.5px;
+  }
+}
