@@ -105,7 +105,7 @@ export function DotField({ theme, active, formation, layout = "final", intro = "
       const load: Promise<ShapeMask> =
         formation.kind === "logo"
           ? loadImageMask(site.brand.mark)
-          : document.fonts.ready.then(() => textMask(formation.text, displayFont(), 700));
+          : document.fonts.ready.then(() => textMask(formation.text, displayFont(), 600));
       load
         .then((mask) => {
           if (!cancelled) engine.setFormation(mask, formationLayouts[layout]);

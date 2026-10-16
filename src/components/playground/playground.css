@@ -1,0 +1,587 @@
+/* ───────── /playground — plain "real" sites for trying Morphic (§11) ─────────
+   Deliberately generic, system-font pages. Not the Morphic brand. */
+
+.pg-stream,
+.pg-shop,
+.pg-pulse {
+  min-height: 100dvh;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  -webkit-font-smoothing: auto;
+}
+.pg-stream h1,
+.pg-stream h3,
+.pg-shop h2,
+.pg-shop h4,
+.pg-pulse h1,
+.pg-pulse h2 {
+  margin: 0;
+}
+
+/* ── Streamly ── */
+.pg-stream {
+  background: #fff;
+  color: #0f0f0f;
+}
+.st-mast {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 56px;
+  padding: 0 16px;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+}
+.st-logo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 19px;
+  color: #3f3f46;
+  text-decoration: none;
+}
+.st-logo-mark {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 20px;
+  border-radius: 6px;
+  background: #52525b;
+  color: #fff;
+  font-size: 11px;
+}
+.st-search {
+  flex: 0 1 520px;
+  margin: 0 auto;
+  height: 38px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  padding: 0 16px;
+  font: inherit;
+}
+.st-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
+  background: #d4d4d8;
+}
+.st-layout {
+  display: flex;
+}
+.st-guide {
+  width: 220px;
+  flex-shrink: 0;
+  padding: 12px;
+  border-right: 1px solid #eee;
+  min-height: calc(100dvh - 56px);
+  display: flex;
+  flex-direction: column;
+}
+.st-guide a {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: inherit;
+  text-decoration: none;
+}
+.st-guide a:hover,
+.st-guide a.is-on {
+  background: #f2f2f2;
+}
+.st-count {
+  font-size: 12px;
+  padding: 0 7px;
+  border-radius: 9999px;
+  background: #0f0f0f;
+  color: #fff;
+}
+.st-main {
+  flex: 1;
+  min-width: 0;
+  padding: 16px 24px 24px;
+}
+.st-chips {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+}
+.st-chips button {
+  flex: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 0;
+  background: #f2f2f2;
+  font: inherit;
+  font-size: 14px;
+}
+.st-chips button.is-on {
+  background: #0f0f0f;
+  color: #fff;
+}
+.st-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 32px 16px;
+}
+.video-card .thumb {
+  display: block;
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #e5e5e5;
+}
+.video-card .thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.video-card .duration {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  font-size: 12px;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+.video-card .details {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+  position: relative;
+}
+.video-card .avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+.video-card .text {
+  min-width: 0;
+  padding-right: 24px;
+}
+.video-card h3 {
+  margin: 0 0 4px;
+  font-size: 16px;
+  line-height: 22px;
+}
+.video-card h3 a {
+  color: inherit;
+  text-decoration: none;
+}
+.video-card .channel-name,
+.video-card .meta {
+  font-size: 14px;
+  color: #606060;
+}
+.video-card .menu-button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  border: 0;
+  background: none;
+  font-size: 20px;
+  cursor: pointer;
+  opacity: 0.6;
+}
+.st-spinner {
+  text-align: center;
+  padding: 24px;
+  color: #606060;
+}
+.st-popup {
+  position: fixed;
+  z-index: 50;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.2);
+  padding: 8px 0;
+  min-width: 240px;
+}
+.st-popup [role="menuitem"] {
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.st-popup [role="menuitem"]:hover {
+  background: #f2f2f2;
+}
+.st-toast {
+  position: fixed;
+  left: 24px;
+  bottom: 24px;
+  background: #0f0f0f;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 8px;
+  z-index: 60;
+}
+.st-watch {
+  flex: 1;
+  padding: 24px;
+}
+.st-player {
+  aspect-ratio: 16 / 9;
+  max-width: 960px;
+  background: #000;
+  border-radius: 12px;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+}
+.st-watch-title {
+  margin-top: 16px !important;
+  font-size: 22px;
+}
+.st-watch-meta {
+  margin-top: 6px;
+  color: #606060;
+}
+@media (max-width: 720px) {
+  .st-guide {
+    display: none;
+  }
+  .st-main {
+    padding: 12px;
+  }
+}
+
+/* ── Shopwise ── */
+.pg-shop {
+  background: #f6f6f4;
+  color: #1d1d1b;
+}
+.sw-head {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 14px 32px;
+  background: #1d1d1b;
+  color: #fff;
+}
+.sw-logo {
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: -0.04em;
+  color: #fff;
+  text-decoration: none;
+}
+.sw-search {
+  flex: 1;
+  max-width: 560px;
+  display: flex;
+}
+.sw-search input {
+  flex: 1;
+  height: 38px;
+  border: 0;
+  border-radius: 8px 0 0 8px;
+  padding: 0 14px;
+  font: inherit;
+}
+.sw-search button {
+  border: 0;
+  border-radius: 0 8px 8px 0;
+  padding: 0 14px;
+  background: #ffcc00;
+  font-weight: 700;
+}
+.sw-head .cart {
+  margin-left: auto;
+  background: #ffcc00;
+  color: #1d1d1b;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-weight: 700;
+}
+.sw-wrap {
+  display: flex;
+  gap: 24px;
+  padding: 24px 32px;
+}
+.sw-filters {
+  width: 200px;
+  flex-shrink: 0;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sw-filters h4 {
+  margin: 14px 0 4px;
+}
+.sw-main {
+  flex: 1;
+  min-width: 0;
+}
+.sw-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  font-size: 14px;
+}
+.results {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 18px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.result-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.result-card img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 8px;
+  display: block;
+}
+.result-card .title {
+  font-size: 15px;
+  font-weight: 600;
+}
+.result-card .title a {
+  color: inherit;
+  text-decoration: none;
+}
+.result-card .price {
+  font-size: 18px;
+  font-weight: 700;
+}
+.result-card .was {
+  text-decoration: line-through;
+  color: #888;
+  font-size: 13px;
+  margin-left: 6px;
+}
+.result-card .stars {
+  color: #e3a008;
+  font-size: 13px;
+}
+.result-card .reviews {
+  color: #555;
+}
+.result-card .ship {
+  font-size: 12px;
+  color: #0066c0;
+  font-weight: 700;
+}
+.add-to-cart {
+  border: 0;
+  background: #ffcc00;
+  border-radius: 18px;
+  padding: 8px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.sw-more {
+  display: block;
+  margin: 24px auto 0;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+@media (max-width: 720px) {
+  .sw-filters {
+    display: none;
+  }
+  .sw-head,
+  .sw-wrap {
+    padding-inline: 14px;
+  }
+}
+
+/* ── Pulseboard ── */
+.pg-pulse {
+  background: #f3f5f9;
+  color: #1e293b;
+}
+.pb-head {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  height: 60px;
+  padding: 0 28px;
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
+}
+.pb-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 18px;
+}
+.pb-logo-mark {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #0ea5e9, #2563eb);
+}
+.pb-head nav {
+  display: flex;
+  gap: 4px;
+}
+.pb-head nav a {
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: #475569;
+  text-decoration: none;
+  font-size: 14px;
+}
+.pb-head nav a.is-on {
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 600;
+}
+.pb-avatar {
+  margin-left: auto;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9999px;
+  background: #1e293b;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+.pb-main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.pb-title {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+.pb-title h1 {
+  font-size: 26px;
+}
+.pb-title span {
+  color: #64748b;
+  font-size: 14px;
+}
+.pb-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+.pb-kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+}
+.pb-kpi-label {
+  font-size: 13px;
+  color: #64748b;
+}
+.pb-kpi-value {
+  font-size: 24px;
+  font-weight: 700;
+}
+.pb-card {
+  padding: 18px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+}
+.pb-card h2 {
+  font-size: 16px;
+  text-transform: capitalize;
+}
+.pb-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.pb-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  border-radius: 8px;
+  background: #f1f5f9;
+}
+.pb-tabs button {
+  border: 0;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  color: #475569;
+}
+.pb-tabs button[aria-selected="true"] {
+  background: #fff;
+  color: #0f172a;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+.pb-chart {
+  width: 100%;
+  height: auto;
+}
+.pb-chart rect {
+  fill: #3b82f6;
+}
+.pb-chart text {
+  font-size: 11px;
+  fill: #64748b;
+}
+.pb-table {
+  width: 100%;
+  margin-top: 10px;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.pb-table th,
+.pb-table td {
+  text-align: left;
+  padding: 9px 10px;
+  border-bottom: 1px solid #f1f5f9;
+}
+.pb-table th {
+  color: #64748b;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+@media (max-width: 720px) {
+  .pb-kpis {
+    grid-template-columns: 1fr 1fr;
+  }
+  .pb-head nav {
+    display: none;
+  }
+}
