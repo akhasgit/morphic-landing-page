@@ -44,7 +44,7 @@ Nothing else changes — focus, auto-advance, the segment bar and ambient glow a
 ## Dev pages
 
 - `/dev/dots` — tune the dot field live (hero, final-tile "M", 404).
-- `/dev/demo` — the demo engine in isolation (every layout, autoplay, the products table).
+- `/dev/demo` — the demo engine in isolation (every layout, autoplay, the products table, the Pulseboard dashboard ↔ chat).
 - `/dev/launch-checklist` — see above.
 
 `/dev/*` is disallowed in `robots.txt`; `/welcome`, `/uninstall` and `/playground/*` are `noindex`.

@@ -1,7 +1,7 @@
 // Demo scripts. Step labels mirror the real side panel's activity rows; timings shown are
 // realistic agent times while the demo itself is compressed (hence the "▶▶ sped up" badge).
 
-import type { DemoEvent } from "./player";
+import type { DemoEvent, DemoSite } from "./player";
 import type { Layout } from "./MorphStage";
 
 type Turn = {
@@ -16,6 +16,8 @@ type Turn = {
   assistant: string;
   version: { v: number; summary: string };
   warnOnRender?: boolean;
+  /** Activity row while the view is built (default "Rendering view grid"). */
+  renderLabel?: string;
   after?: (tEnd: number) => DemoEvent[];
 };
 
@@ -46,7 +48,7 @@ export function turn(o: Turn): { events: DemoEvent[]; end: number } {
     { at: s(send), type: "step", id: "agent", label: "UI engineer: building the view", timing: o.timings[0] },
     { at: s(at.read), type: "step", id: "read", label: "Reading the page", indent: 1, timing: o.timings[1] },
     { at: s(at.render), type: "stepDone", id: "read" },
-    { at: s(at.render), type: "step", id: "render", label: "Rendering view grid", indent: 1, timing: o.timings[2] },
+    { at: s(at.render), type: "step", id: "render", label: o.renderLabel ?? "Rendering view grid", indent: 1, timing: o.timings[2] },
     ...(o.warnOnRender !== false ? [{ at: s(at.renderWarn), type: "stepDone", id: "render", status: "warn" } as DemoEvent] : []),
     { at: s(at.renderOk), type: "stepDone", id: "render" },
     { at: s(at.shot), type: "step", id: "shot", label: "Taking a screenshot", indent: 1, timing: o.timings[3] },
@@ -65,64 +67,95 @@ export function turn(o: Turn): { events: DemoEvent[]; end: number } {
   return { events: [...ev, ...(o.after?.(end) ?? [])], end };
 }
 
-/** Hero autoplay (§7.1), ~26s loop. */
-export function heroScript(): { events: DemoEvent[]; duration: number } {
-  const a = turn({
+const DASHBOARD_PROMPT = "Turn this into charts and let me ask questions about it";
+
+/**
+ * Hero autoplay (§7.1), ~35s loop, in chip order: the Pulseboard dashboard becomes charts + chat,
+ * then the tab moves to Streamly → swipe deck → table → grid of circles → flip to the original.
+ * `introEnd` is when the first example has fully landed (the reduced-motion "after" state).
+ */
+export function heroScript(): { events: DemoEvent[]; duration: number; introEnd: number } {
+  // Its in-page Q&A plays for ~3s after the morph (MetricLayouts), so the beat holds a little longer.
+  const d = turn({
     t: 0.8,
-    prompt: "make all the videos a grid of circles",
-    layout: "circle-grid",
-    timings: ["24.1s", "2.4s", "6.8s", "3.1s", "1.9s", "0.6s"],
-    meta: "26.5s · 6 steps",
-    assistant: "Done — all 12 videos are now a grid of circles. Click any circle to open it.",
-    version: { v: 2, summary: "Grid of circles for every video" },
+    prompt: DASHBOARD_PROMPT,
+    layout: "chat",
+    msPerChar: 34,
+    renderLabel: "Rendering charts + chat",
+    timings: ["22.8s", "2.6s", "7.4s", "3.0s", "1.7s", "0.6s"],
+    meta: "23.6s · 6 steps",
+    assistant: "Done — the dashboard is now three key numbers, two compact charts and a chat that answers from the page's data.",
+    version: { v: 2, summary: "Charts + chat over the numbers" },
+    warnOnRender: false,
   });
   const b = turn({
-    t: 8.5,
-    prompt: "now make it swipeable cards",
+    t: 10.4,
+    prompt: "make these swipeable cards",
     layout: "deck",
     timings: ["17.4s", "1.8s", "5.9s", "2.7s", "1.6s", "0.5s"],
     meta: "18.2s · 6 steps",
     assistant: "Done — your feed is now a swipeable deck. Swipe right to save a video to Watch later.",
-    version: { v: 3, summary: "Swipe deck · right = Watch later" },
+    version: { v: 2, summary: "Swipe deck · right = Watch later" },
     warnOnRender: false,
     after: (end) => [{ at: s(end + 0.6), type: "deckSwipe" }],
   });
   const c = turn({
-    t: 15,
+    t: 16.9,
     prompt: "show it as a table sorted by views",
     layout: "table",
     timings: ["20.9s", "2.1s", "7.2s", "2.9s", "1.8s", "0.6s"],
     meta: "21.7s · 6 steps",
     assistant: "Here are all 12 videos as a table, sorted by views. Click a header to re-sort.",
-    version: { v: 4, summary: "Table sorted by views" },
+    version: { v: 3, summary: "Table sorted by views" },
     warnOnRender: false,
+  });
+  const a = turn({
+    t: 23.6,
+    prompt: "make all the videos a grid of circles",
+    layout: "circle-grid",
+    timings: ["24.1s", "2.4s", "6.8s", "3.1s", "1.9s", "0.6s"],
+    meta: "26.5s · 6 steps",
+    assistant: "Done — all 12 videos are now a grid of circles. Click any circle to open it.",
+    version: { v: 4, summary: "Grid of circles for every video" },
   });
   // Rows reorder by views just after the table lands.
   const tableAt = c.events.find((e) => e.type === "morph")!.at;
   return {
     events: [
-      { at: 0, type: "reset" },
-      ...a.events,
+      { at: 0, type: "reset", site: "pulseboard" },
+      ...d.events,
+      { at: s(9.8), type: "site", site: "streamly" },
       ...b.events,
       ...c.events,
       { at: tableAt + 650, type: "sort", sort: { key: "views", dir: "desc" } },
-      { at: s(21), type: "toggle", on: false },
-      { at: s(24), type: "toggle", on: true },
+      ...a.events,
+      { at: s(30.4), type: "toggle", on: false },
+      { at: s(33.2), type: "toggle", on: true },
     ],
-    duration: s(26.2),
+    duration: s(35.4),
+    introEnd: s(d.end + 1),
   };
 }
 
-export type Chip = { label: string; prompt?: string; layout: Layout; summary: string; assistant: string };
+export type Chip = {
+  label: string;
+  prompt?: string;
+  layout: Layout;
+  summary: string;
+  assistant: string;
+  /** Demo site the prompt runs on (default Streamly). */
+  site?: DemoSite;
+};
 
 /** Prompt chips under the hero demo (§7.1). */
 export const heroChips: Chip[] = [
   {
-    label: "Circle grid",
-    prompt: "make all the videos a grid of circles",
-    layout: "circle-grid",
-    summary: "Grid of circles for every video",
-    assistant: "Done — every video is now a circle. Click one to open it.",
+    label: "Dashboard → chat",
+    site: "pulseboard",
+    prompt: DASHBOARD_PROMPT,
+    layout: "chat",
+    summary: "Charts + chat over the numbers",
+    assistant: "Done — three key numbers, two compact charts, and a chat that answers from the page's data.",
   },
   {
     label: "Swipe deck",
@@ -152,10 +185,20 @@ export const heroChips: Chip[] = [
     summary: "One column, big type",
     assistant: "Done — one column, big text, high contrast.",
   },
+  {
+    label: "Circle grid",
+    prompt: "make all the videos a grid of circles",
+    layout: "circle-grid",
+    summary: "Grid of circles for every video",
+    assistant: "Done — every video is now a circle. Click one to open it.",
+  },
   { label: "Original", layout: "original", summary: "", assistant: "" },
 ];
 
-/** A chip interrupts autoplay: fast-type (12ms/char), compressed 1.2s run, morph. */
+/**
+ * A chip interrupts autoplay: fast-type (12ms/char), compressed 1.2s run, morph. Prompt chips
+ * first take the tab to their site (a no-op when it's already there); "Original" stays put.
+ */
 export function chipScript(chip: Chip, version: number): { events: DemoEvent[]; duration: number } {
   if (!chip.prompt) {
     return { events: [{ at: 0, type: "toggle", on: false }], duration: 400 };
@@ -171,6 +214,7 @@ export function chipScript(chip: Chip, version: number): { events: DemoEvent[]; 
     assistant: chip.assistant,
     version: { v: version, summary: chip.summary },
     warnOnRender: false,
+    renderLabel: chip.layout === "chat" ? "Rendering charts + chat" : undefined,
     after: (end) =>
       chip.layout === "deck"
         ? [{ at: s(end + 0.3), type: "deckSwipe" }]
@@ -178,5 +222,8 @@ export function chipScript(chip: Chip, version: number): { events: DemoEvent[]; 
           ? [{ at: s(end - 0.5), type: "sort", sort: { key: "views", dir: "desc" } }]
           : [],
   });
-  return { events: [{ at: 0, type: "toggle", on: true }, ...t.events], duration: s(t.end + 0.6) };
+  return {
+    events: [{ at: 0, type: "site", site: chip.site ?? "streamly" }, { at: 0, type: "toggle", on: true }, ...t.events],
+    duration: s(t.end + 0.6),
+  };
 }

@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import { BrowserFrame, SpedUpBadge } from "@/components/demo/BrowserFrame";
 import { MorphicPanel } from "@/components/demo/MorphicPanel";
 import { MorphStage, type Layout } from "@/components/demo/MorphStage";
-import { useDemoPlayer } from "@/components/demo/player";
+import { initialDemoState, useDemoPlayer } from "@/components/demo/player";
 import { heroScript } from "@/components/demo/scripts";
-import { products, sites, videos } from "@/demo/data";
+import { metrics, products, sites, videos } from "@/demo/data";
 import "@/components/demo/demo.css";
 
 const LAYOUTS: Layout[] = ["original", "circle-grid", "deck", "table", "grid", "reader", "big-text"];
@@ -14,9 +14,10 @@ const LAYOUTS: Layout[] = ["original", "circle-grid", "deck", "table", "grid", "
 /** /dev/demo — the demo engine in isolation (§5, §15 step 3). */
 export function DemoLab() {
   const [auto, setAuto] = useState(true);
-  const { player, state } = useDemoPlayer(auto);
+  const { player, state } = useDemoPlayer(auto, () => initialDemoState("original", "pulseboard"));
   const [manual, setManual] = useState<Layout>("original");
   const [productLayout, setProductLayout] = useState<Layout>("original");
+  const [metricLayout, setMetricLayout] = useState<Layout>("original");
 
   useEffect(() => {
     const { events, duration } = heroScript();
@@ -25,6 +26,7 @@ export function DemoLab() {
   }, [player]);
 
   const layout = auto ? state.layout : manual;
+  const site = auto ? state.site : "streamly";
 
   return (
     <div data-theme="dark" className="min-h-dvh bg-[var(--bg)] p-6 text-ink">
@@ -48,12 +50,16 @@ export function DemoLab() {
       </div>
 
       <BrowserFrame
-        url={sites.streamly.domain}
+        url={sites[site].domain}
         className="h-[560px] w-[860px]"
         badge={<SpedUpBadge />}
-        panel={<MorphicPanel state={state} clock={player.clock} domain={sites.streamly.domain} interactive />}
+        panel={<MorphicPanel state={state} clock={player.clock} domain={sites[site].domain} interactive />}
       >
-        <MorphStage dataset="videos" records={videos} layout={layout} sort={auto ? state.sort : null} deckSwipe={state.deckSwipe} interactive />
+        {site === "pulseboard" ? (
+          <MorphStage key="pulseboard" dataset="metrics" records={metrics} layout={layout} />
+        ) : (
+          <MorphStage key="streamly" dataset="videos" records={videos} layout={layout} sort={auto ? state.sort : null} deckSwipe={state.deckSwipe} interactive />
+        )}
       </BrowserFrame>
 
       <div className="mb-3 mt-8 flex gap-2">
@@ -73,6 +79,29 @@ export function DemoLab() {
         </BrowserFrame>
         <BrowserFrame url={sites.shopwise.domain} className="h-[480px] w-[340px]">
           <MorphStage dataset="products" records={products} layout={productLayout} compact />
+        </BrowserFrame>
+      </div>
+
+      <div className="mb-3 mt-8 flex gap-2">
+        {(["original", "chat"] as Layout[]).map((l) => (
+          <button
+            key={l}
+            className={`rounded-lg border px-3 py-1.5 font-mono text-xs ${metricLayout === l ? "border-accent bg-accent text-white" : "border-line"}`}
+            onClick={() => setMetricLayout(l)}
+          >
+            metrics: {l}
+          </button>
+        ))}
+      </div>
+      <div className="flex gap-6">
+        <BrowserFrame url={`${sites.pulseboard.domain}/overview`} className="h-[560px] w-[560px]">
+          <MorphStage dataset="metrics" records={metrics} layout={metricLayout} interactive />
+        </BrowserFrame>
+        <BrowserFrame url={`${sites.pulseboard.domain}/overview`} className="h-[480px] w-[820px]">
+          <MorphStage dataset="metrics" records={metrics} layout={metricLayout} interactive />
+        </BrowserFrame>
+        <BrowserFrame url={sites.pulseboard.domain} className="h-[300px] w-[340px]">
+          <MorphStage dataset="metrics" records={metrics} layout={metricLayout} compact />
         </BrowserFrame>
       </div>
     </div>

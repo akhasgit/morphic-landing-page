@@ -27,9 +27,11 @@ export type DemoEvent =
   | { at: number; type: "caption"; text: string | null }
   | { at: number; type: "deckSwipe" }
   | { at: number; type: "sort"; sort: SortState }
+  // Extra: the tab navigates to another demo site (its conversation and view are restored).
+  | { at: number; type: "site"; site: DemoSite }
   // Extra: the version chip's Undo — back to the previous layout.
   | { at: number; type: "undo" }
-  | { at: number; type: "reset" };
+  | { at: number; type: "reset"; site?: DemoSite };
 
 /** A DemoEvent without its timestamp (distributes over the union). */
 export type DemoEventInput = DemoEvent extends infer E ? (E extends DemoEvent ? Omit<E, "at"> & { at?: number } : never) : never;
@@ -50,7 +52,13 @@ export type ChatItem =
   | { kind: "assistant"; key: string; text: string; startedAt: number; meta?: string }
   | { kind: "version"; key: string; v: number; summary: string; undone?: boolean };
 
+export type DemoSite = "streamly" | "pulseboard";
+type SiteSnapshot = { items: ChatItem[]; layout: Layout; history: Layout[] };
+
 export type DemoState = {
+  /** Which demo site the frame shows; each keeps its own conversation and version history. */
+  site: DemoSite;
+  saved: Partial<Record<DemoSite, SiteSnapshot>>;
   typing: { text: string; at: number; msPerChar: number } | null;
   items: ChatItem[];
   layout: Layout;
@@ -66,7 +74,9 @@ export type DemoState = {
   history: Layout[];
 };
 
-export const initialDemoState = (layout: Layout = "original"): DemoState => ({
+export const initialDemoState = (layout: Layout = "original", site: DemoSite = "streamly"): DemoState => ({
+  site,
+  saved: {},
   typing: null,
   items: [],
   layout,
@@ -95,7 +105,7 @@ function lastRun(items: ChatItem[]) {
 function reduce(s: DemoState, ev: DemoEvent, plan: Map<string, number>): DemoState {
   switch (ev.type) {
     case "reset":
-      return initialDemoState();
+      return initialDemoState("original", ev.site);
     case "typePrompt":
       return { ...s, typing: { text: ev.text, at: ev.at, msPerChar: ev.msPerChar ?? 40 }, promptLayout: ev.layout ?? s.promptLayout };
     case "send": {
@@ -165,6 +175,24 @@ function reduce(s: DemoState, ev: DemoEvent, plan: Map<string, number>): DemoSta
       return { ...s, deckSwipe: s.deckSwipe + 1 };
     case "sort":
       return { ...s, sort: ev.sort };
+    case "site": {
+      if (ev.site === s.site) return s;
+      const back = s.saved[ev.site];
+      return {
+        ...s,
+        saved: { ...s.saved, [s.site]: { items: settleItems(s.items), layout: s.versionLayout, history: s.history } },
+        site: ev.site,
+        items: back?.items ?? [],
+        layout: back?.layout ?? "original",
+        versionLayout: back?.layout ?? "original",
+        history: back?.history ?? ["original"],
+        toggle: true,
+        typing: null,
+        running: false,
+        caption: null,
+        sort: null,
+      };
+    }
     case "undo": {
       const history = s.history.length > 1 ? s.history.slice(0, -1) : ["original" as Layout];
       const prev = history[history.length - 1];
@@ -181,20 +209,20 @@ function reduce(s: DemoState, ev: DemoEvent, plan: Map<string, number>): DemoSta
   }
 }
 
+/** Finishes chat items mid-flight: text fully streamed, steps done (clock-independent). */
+function settleItems(items: ChatItem[]): ChatItem[] {
+  return items.map((it) => {
+    if (it.kind === "assistant") return { ...it, startedAt: -1e9 };
+    if (it.kind === "run" && !it.done)
+      return { ...it, done: true, summary: it.summary ?? "1 agent", steps: it.steps.map((st) => ({ ...st, status: "ok" as const, startedAt: -1e9, doneAt: -1e9 })) };
+    if (it.kind === "run") return { ...it, steps: it.steps.map((st) => ({ ...st, startedAt: -1e9, doneAt: -1e9 })) };
+    return it;
+  });
+}
+
 /** Ends anything mid-flight (used when a new script interrupts the current one). */
 function settle(s: DemoState): DemoState {
-  return {
-    ...s,
-    typing: null,
-    running: false,
-    items: s.items.map((it) => {
-      if (it.kind === "assistant") return { ...it, startedAt: -1e9 };
-      if (it.kind === "run" && !it.done)
-        return { ...it, done: true, summary: it.summary ?? "1 agent", steps: it.steps.map((st) => ({ ...st, status: "ok" as const, startedAt: -1e9, doneAt: -1e9 })) };
-      if (it.kind === "run") return { ...it, steps: it.steps.map((st) => ({ ...st, startedAt: -1e9, doneAt: -1e9 })) };
-      return it;
-    }),
-  };
+  return { ...s, typing: null, running: false, items: settleItems(s.items) };
 }
 
 export class DemoPlayer {

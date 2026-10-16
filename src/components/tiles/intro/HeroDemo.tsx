@@ -7,15 +7,17 @@ import { dotBus } from "@/components/dotfield/bus";
 import { BrowserFrame, SpedUpBadge } from "@/components/demo/BrowserFrame";
 import { MorphicPanel } from "@/components/demo/MorphicPanel";
 import { MorphStage, type Layout } from "@/components/demo/MorphStage";
-import { useDemoPlayer, type ChatItem, type DemoState } from "@/components/demo/player";
+import { initialDemoState, useDemoPlayer, type ChatItem, type DemoState } from "@/components/demo/player";
 import { chipScript, heroChips, heroScript, type Chip } from "@/components/demo/scripts";
-import { sites, videos } from "@/demo/data";
+import { metrics, sites, videos } from "@/demo/data";
 import { track } from "@/lib/analytics";
 import { useIsDesktop, usePrefersReducedMotion } from "@/lib/hooks";
 import { useHeroStore } from "@/store/hero";
 import { useTile } from "../TileContext";
 
-const LINE_FOR: Partial<Record<Layout, number>> = { "circle-grid": 0, deck: 1, table: 2 };
+const LINE_FOR: Partial<Record<Layout, number>> = { chat: 0, deck: 1, table: 2, "circle-grid": 3 };
+const startOnDashboard = () => initialDemoState("original", "pulseboard");
+const SITE_URL = { streamly: sites.streamly.domain, pulseboard: `${sites.pulseboard.domain}/overview` } as const;
 
 function nextVersion(items: ChatItem[]) {
   for (let i = items.length - 1; i >= 0; i--) {
@@ -26,15 +28,15 @@ function nextVersion(items: ChatItem[]) {
 }
 
 /**
- * Hero demo (§7.1): BrowserFrame + MorphStage (Streamly) + docked MorphicPanel on a
- * ~26s autoplay loop. Chips interrupt with a compressed run; autoplay resumes after 8s idle.
+ * Hero demo (§7.1): BrowserFrame + MorphStage + docked MorphicPanel on a ~35s autoplay loop
+ * (Pulseboard dashboard → charts + chat; then the Streamly feed → cards → table → circles). Chips interrupt with a compressed run; autoplay resumes after 8s idle.
  * The frame tilts toward the cursor (±4°) with a specular sheen.
  */
 export function HeroDemo() {
   const { isActive } = useTile();
   const isDesktop = useIsDesktop();
   const reduced = usePrefersReducedMotion();
-  const { player, state } = useDemoPlayer(isActive);
+  const { player, state } = useDemoPlayer(isActive, startOnDashboard);
   const [paused, setPaused] = useState(false);
   const pausedRef = useRef(false);
   const startedRef = useRef(false);
@@ -61,10 +63,10 @@ export function HeroDemo() {
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       // Reduced motion: no autoplay; show the "after" state with a play button.
-      const { events } = heroScript();
+      const { events, introEnd } = heroScript();
       player.load(
-        events.filter((e) => e.at <= 6500),
-        { duration: 6600 },
+        events.filter((e) => e.at <= introEnd),
+        { duration: introEnd + 100 },
       );
       player.finish();
       loadAutoplay();
@@ -109,7 +111,10 @@ export function HeroDemo() {
   const runChip = (chip: Chip) => {
     track("demo_chip_click", { prompt: chip.label });
     window.clearTimeout(idle.current);
-    const { events, duration } = chipScript(chip, nextVersion(state.items));
+    // Each site keeps its own conversation, so number the version on the chip's site.
+    const site = chip.prompt ? (chip.site ?? "streamly") : state.site;
+    const items = site === state.site ? state.items : (state.saved[site]?.items ?? []);
+    const { events, duration } = chipScript(chip, nextVersion(items));
     player.load(events, { duration, keepState: true, onEnd: resumeLater });
     startedRef.current = true;
     pausedRef.current = false;
@@ -156,15 +161,16 @@ export function HeroDemo() {
   return (
     <div className="hero-demo">
       <p className="sr-only">
-        Demo: a cluttered video site turns into a grid of circles, then swipeable cards, then a table sorted by views, while the Morphic side
-        panel shows the agent at work. The original site is one click away.
+        Demo: a busy analytics dashboard turns into three key numbers, two compact charts and a chat that answers questions about the data;
+        then a cluttered video site becomes swipeable cards, a table sorted by views and a grid of circles, while the Morphic side panel
+        shows the agent at work. The original site is one click away.
       </p>
       <div className="hero-frame-wrap">
         <motion.div className="hero-tilt" style={{ rotateX: rx, rotateY: ry }}>
           <div aria-hidden="true" className="hero-frame-shell">
             <BrowserFrame
               ref={frameRef}
-              url={sites.streamly.domain}
+              url={isDesktop ? SITE_URL[state.site] : sites[state.site].domain}
               className="hero-frame"
               badge={<SpedUpBadge />}
               corner={<span className="hero-pause-slot" />}
@@ -174,7 +180,7 @@ export function HeroDemo() {
                   <MorphicPanel
                     state={state}
                     clock={player.clock}
-                    domain={sites.streamly.domain}
+                    domain={sites[state.site].domain}
                     onToggle={() => {
                       track("toggle_flip", { to: state.toggle ? "original" : "morphic" });
                       player.dispatch({ type: "toggle", on: !state.toggle });
@@ -188,15 +194,37 @@ export function HeroDemo() {
                 ) : undefined
               }
             >
-              <MorphStage
-                dataset="videos"
-                records={videos}
-                layout={state.layout}
-                sort={state.sort}
-                deckSwipe={state.deckSwipe}
-                interactive
-                onMorphStart={() => dotBus.shockwaveFrom(frameRef.current, 1)}
-              />
+              {/* The tab "navigates" between demo sites: a quick page-load crossfade. */}
+              <AnimatePresence initial={false}>
+                <motion.div
+                  key={state.site}
+                  className="hero-site"
+                  initial={{ opacity: 0, y: 10, filter: "blur(6px)" }}
+                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, filter: "blur(6px)" }}
+                  transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  {state.site === "pulseboard" ? (
+                    <MorphStage
+                      dataset="metrics"
+                      records={metrics}
+                      layout={state.layout}
+                      compact={!isDesktop}
+                      onMorphStart={() => dotBus.shockwaveFrom(frameRef.current, 1)}
+                    />
+                  ) : (
+                    <MorphStage
+                      dataset="videos"
+                      records={videos}
+                      layout={state.layout}
+                      sort={state.sort}
+                      deckSwipe={state.deckSwipe}
+                      interactive
+                      onMorphStart={() => dotBus.shockwaveFrom(frameRef.current, 1)}
+                    />
+                  )}
+                </motion.div>
+              </AnimatePresence>
               <AnimatePresence>
                 {state.caption && (
                   <motion.div
@@ -256,7 +284,8 @@ function MobilePrompt({ state, clock }: { state: DemoState; clock: MotionValue<n
     if (it.kind === "version") version = it.v;
   }
   const text = state.typing ? typed : lastUser;
-  if (!text) return null;
+  // The chat view has its own in-page conversation along the bottom; don't cover it.
+  if (!text || (state.layout === "chat" && !state.typing && !state.running)) return null;
   return (
     <div className="hero-mprompt">
       <span className="hero-mprompt-bubble">

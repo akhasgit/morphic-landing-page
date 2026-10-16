@@ -1799,3 +1799,577 @@ span.d-td-views {
   background: var(--accent-hover);
   animation: pulse-dot 1s steps(2) infinite;
 }
+
+/* ───────── Original (Pulseboard dashboard) ─────────
+   Clutter sits *under* the records here: the chart card's frame is clutter, its bars are records. */
+
+.d-clutter.is-pulse {
+  z-index: 0;
+}
+.d-p-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.d-c-top.is-pulse {
+  gap: 0.8em;
+}
+.d-p-logo {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  font-weight: 700;
+  color: #1e293b;
+  letter-spacing: -0.02em;
+}
+.d-p-logo i {
+  width: 1.15em;
+  height: 1.15em;
+  border-radius: 0.3em;
+  background: linear-gradient(135deg, #0ea5e9, #2563eb);
+}
+.d-p-tabs {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  gap: 0.15em;
+  overflow: hidden;
+}
+.d-p-tabs > * {
+  flex: none;
+  font-size: 0.6em;
+  padding: 0.4em 0.75em;
+  border-radius: 0.5em;
+  color: #64748b;
+  font-weight: 500;
+}
+.d-p-tabs b {
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 600;
+}
+.d-p-range {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 0.35em;
+  font-size: 0.58em;
+  padding: 0.4em 0.7em;
+  border-radius: 0.5em;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+}
+.d-p-range svg {
+  width: 1.1em;
+  height: 1.1em;
+}
+.d-p-export {
+  flex: none;
+  font-size: 0.58em;
+  font-weight: 600;
+  padding: 0.45em 0.8em;
+  border-radius: 0.5em;
+  background: #1e293b;
+  color: #fff;
+}
+.d-c-nav.is-pulse span.is-on {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+.d-p-banner {
+  position: absolute;
+  left: 6.6em;
+  right: 0.6em;
+  top: 3.1em;
+  height: 1.9em;
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0 0.7em;
+  border-radius: 0.5em;
+  background: #fef9e7;
+  border: 1px solid #f3e1a8;
+}
+.d-p-banner-copy {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.6em;
+  color: #6b5a2a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.d-p-banner-copy b {
+  color: #3f2a00;
+}
+.d-p-banner-btn {
+  flex: none;
+  font-size: 0.56em;
+  font-weight: 700;
+  padding: 0.35em 0.8em;
+  border-radius: 0.4em;
+  background: #3f3f46;
+  color: #fff;
+}
+.d-p-kpis {
+  position: absolute;
+  left: 6.6em;
+  right: 0.6em;
+  top: 5.5em;
+  height: 4.5em;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.55em;
+}
+.d-p-kpi {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.12em;
+  padding: 0 0.75em;
+  border-radius: 0.6em;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+}
+.d-p-kpi-label {
+  font-size: 0.56em;
+  color: #64748b;
+  white-space: nowrap;
+}
+.d-p-kpi-value {
+  font-size: 1.12em;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.d-p-kpi-delta {
+  font-size: 0.5em;
+  color: #16a34a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.d-p-chart {
+  position: absolute;
+  left: 6.6em;
+  right: 0.6em;
+  top: 10.6em;
+  height: 12em;
+}
+.d-p-chart.is-frame {
+  border-radius: 0.6em;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+}
+.d-p-chart-title {
+  position: absolute;
+  left: 0.8em;
+  right: 0.8em;
+  top: 0.65em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.62em;
+  font-weight: 600;
+  color: #0f172a;
+}
+.d-p-chart-title em {
+  display: flex;
+  align-items: center;
+  gap: 0.45em;
+  font-style: normal;
+  font-weight: 500;
+  color: #64748b;
+}
+.d-p-chart-title em i {
+  width: 0.75em;
+  height: 0.75em;
+  border-radius: 0.2em;
+  background: #3b82f6;
+}
+.d-p-chart-title em i.is-b {
+  background: #cbd5e1;
+}
+.d-p-grid {
+  position: absolute;
+  left: 3em;
+  right: 0.9em;
+  top: 2.4em;
+  bottom: 1.7em;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.d-p-grid i {
+  height: 1px;
+  background: #eef2f7;
+}
+.d-p-yaxis {
+  position: absolute;
+  left: 0.55em;
+  top: 2.15em;
+  bottom: 1.45em;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.d-p-yaxis i,
+.d-p-xaxis i {
+  font-style: normal;
+  font-size: 0.46em;
+  color: #94a3b8;
+}
+.d-p-xaxis {
+  position: absolute;
+  left: 3em;
+  right: 0.9em;
+  bottom: 0.45em;
+  display: flex;
+  justify-content: space-around;
+}
+.d-p-bars {
+  position: absolute;
+  left: 3em;
+  right: 0.9em;
+  top: 2.4em;
+  bottom: 1.7em;
+  display: flex;
+  align-items: flex-end;
+  gap: 0.45em;
+  padding: 0 0.35em;
+}
+.d-p-bar {
+  flex: 1;
+  border-radius: 0.25em 0.25em 0 0;
+  background: #3b82f6;
+}
+.d-p-table {
+  position: absolute;
+  left: 6.6em;
+  right: 0.6em;
+  top: 23.2em;
+  height: 18em;
+  display: flex;
+  flex-direction: column;
+  padding: 0.6em 0.8em;
+  border-radius: 0.6em;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+}
+.d-p-table-title {
+  font-size: 0.62em;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 0.4em;
+}
+.d-p-tr {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: 0.28em 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+.d-p-tr i {
+  font-style: normal;
+  font-size: 0.55em;
+  color: #334155;
+  font-variant-numeric: tabular-nums;
+}
+.d-p-tr.is-head i {
+  color: #94a3b8;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.d-p-toast {
+  position: absolute;
+  right: 1.4em;
+  bottom: 1.4em;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  font-size: 0.58em;
+  padding: 0.7em 1em;
+  border-radius: 0.7em;
+  background: #0f172a;
+  color: #e2e8f0;
+  box-shadow: 0 0.8em 2em -0.6em rgba(0, 0, 0, 0.45);
+}
+.d-p-toast b {
+  color: #fff;
+}
+.d-p-toast svg {
+  width: 1.1em;
+  height: 1.1em;
+}
+
+/* ───────── Chat (talk to the numbers + concise charts) ───────── */
+
+.d-chat {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 1em 1.1em 1.1em;
+}
+.d-chat-body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 0.8em;
+}
+.d-chat-data {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7em;
+  min-height: 0;
+}
+.d-chat-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55em;
+}
+.d-chat-stat {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1em;
+  padding: 0.55em 0.75em;
+  border-radius: 0.7em;
+  background: #fff;
+  border: 1px solid #e5e7f0;
+  box-shadow: 0 0.2em 0.6em -0.3em rgba(30, 16, 80, 0.18);
+}
+.d-chat-stat-label {
+  font-size: 0.56em;
+  color: #6b7280;
+}
+.d-chat-stat-value {
+  font-family: var(--font-display);
+  font-size: 1.08em;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #111827;
+  font-variant-numeric: tabular-nums;
+}
+.d-chat-charts {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6em;
+  height: 9.5em;
+}
+.d-chat-chart {
+  padding: 0.55em 0.7em;
+  border-radius: 0.7em;
+  background: #fff;
+  border: 1px solid #e5e7f0;
+}
+.d-chat-chart-title {
+  font-size: 0.56em;
+  font-weight: 600;
+  color: #374151;
+}
+.d-chat-bars {
+  position: absolute;
+  top: 1.9em;
+  bottom: 0.75em;
+  width: calc(50% - 0.3em);
+  display: flex;
+  align-items: flex-end;
+  gap: 0.22em;
+  padding: 0 0.75em;
+  pointer-events: none;
+}
+.d-chat-bars.is-rev {
+  left: 0;
+}
+.d-chat-bars.is-churn {
+  right: 0;
+}
+.d-chat-bar-col {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+.d-chat-bar {
+  width: 100%;
+  border-radius: 0.2em 0.2em 0 0;
+  background: linear-gradient(180deg, #6366f1, #4338ca);
+}
+.d-chat-bar.is-churn {
+  background: #c7d2fe;
+  transition:
+    background 300ms,
+    box-shadow 300ms;
+}
+.d-chat-bar.is-churn[data-hl] {
+  background: linear-gradient(180deg, #a78bfa, #6366f1);
+  box-shadow: 0 0 0.9em rgba(99, 102, 241, 0.75);
+}
+.d-chat-thread {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 0.8em;
+  background: #fff;
+  border: 1px solid #e5e7f0;
+  box-shadow: 0 0.4em 1.2em -0.6em rgba(30, 16, 80, 0.2);
+}
+.d-chat-msgs {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.55em;
+  padding: 0.8em;
+  overflow: hidden;
+  /* older messages scroll off under a soft edge */
+  mask-image: linear-gradient(transparent, #000 1.4em);
+}
+.d-chat-q {
+  align-self: flex-end;
+  max-width: 85%;
+  padding: 0.5em 0.8em;
+  border-radius: 0.95em 0.95em 0.25em 0.95em;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.88em;
+  line-height: 1.35;
+}
+.d-chat-a {
+  align-self: flex-start;
+  max-width: 92%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4em;
+}
+.d-chat-a p {
+  padding: 0.55em 0.8em;
+  border-radius: 0.95em 0.95em 0.95em 0.25em;
+  background: #f3f4f6;
+  color: #111827;
+  font-size: 0.9em;
+  line-height: 1.45;
+}
+.d-chat-src {
+  font-family: var(--font-mono);
+  font-size: 0.64em;
+  padding: 0.3em 0.55em;
+  border-radius: 0.4em;
+  color: #4f46e5;
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.22);
+}
+.d-chat-sugg {
+  flex: none;
+  display: flex;
+  gap: 0.4em;
+  margin: 0 0.6em 0.45em;
+  overflow: hidden;
+}
+.d-chat-sugg span {
+  flex: none;
+  font-size: 0.68em;
+  padding: 0.35em 0.75em;
+  border-radius: 999px;
+  border: 1px solid #e0e3f0;
+  color: #4b5563;
+  background: #fafbff;
+  white-space: nowrap;
+}
+.d-chat-input {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  margin: 0 0.6em 0.6em;
+  padding: 0.4em 0.45em 0.4em 0.8em;
+  border-radius: 0.65em;
+  border: 1px solid #e5e7eb;
+  background: #fafafa;
+}
+.d-chat-input span {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.8em;
+  color: #9ca3af;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.d-chat-input span.is-typing {
+  color: #111827;
+}
+.d-chat-input i {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2em;
+  height: 2em;
+  border-radius: 0.45em;
+  background: var(--accent);
+  color: #fff;
+}
+.d-chat-input svg {
+  width: 0.95em;
+  height: 0.95em;
+}
+/* Tall stages (the hero frame): give the charts more room. */
+@container (max-aspect-ratio: 1 / 1) {
+  .d-chat-charts {
+    height: 15em;
+  }
+}
+/* Wide stages: data left, chat right. */
+@container (min-aspect-ratio: 3 / 2) {
+  .d-chat-body {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .d-chat-charts {
+    flex: 1;
+    height: auto;
+  }
+}
+.d-chat[data-compact] .d-chat-charts {
+  height: 7.6em;
+}
+.d-chat[data-compact] .d-chat-sugg {
+  display: none;
+}
+/* Very short stages (small phones): keep the question + answer in view. */
+@container (max-height: 200px) {
+  .d-chat-a.is-greet {
+    display: none;
+  }
+  .d-chat {
+    padding: 0.6em 0.7em 0.7em;
+  }
+  .d-chat-body,
+  .d-chat-data {
+    gap: 0.45em;
+  }
+  .d-chat-stat {
+    padding: 0.35em 0.6em;
+  }
+  .d-chat[data-compact] .d-chat-charts {
+    height: 6.2em;
+  }
+  .d-chat-msgs {
+    padding: 0.5em 0.6em;
+    gap: 0.4em;
+  }
+  .d-chat-input {
+    margin: 0 0.45em 0.45em;
+  }
+}

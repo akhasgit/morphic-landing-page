@@ -1,13 +1,15 @@
 "use client";
 
-import { AnimatePresence, LayoutGroup, m as motion, type Transition } from "motion/react";
+import { AnimatePresence, LayoutGroup, m as motion } from "motion/react";
 import { ArrowUpRight, ChevronDown, Heart, Search, ShoppingCart, Star, X } from "lucide-react";
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { formatCount, formatPrice, formatViews, type Product, type Video } from "@/demo/data";
+import { formatCount, formatPrice, formatViews, type Metric, type Product, type Video } from "@/demo/data";
+import { MetricLayouts, PulseboardClutter } from "./MetricLayouts";
+import { Clutter, chromeIn, clutterExit, fadeIn, recT } from "./stage-presets";
 import { Thumb } from "./Thumb";
 import "./demo.css";
 
-export type Layout = "original" | "circle-grid" | "deck" | "table" | "grid" | "reader" | "big-text";
+export type Layout = "original" | "circle-grid" | "deck" | "table" | "grid" | "reader" | "big-text" | "chat";
 export type SortState = { key: "views" | "title" | "age" | "price" | "rating" | "reviews"; dir: "asc" | "desc" } | null;
 export type CellHover = { id: string; field: string; selector: string; x: number; y: number } | null;
 
@@ -25,6 +27,7 @@ type Common = {
 };
 type Props =
   | (Common & { dataset: "videos"; records: Video[] })
+  | (Common & { dataset: "metrics"; records: Metric[] })
   | (Common & {
       dataset: "products";
       records: Product[];
@@ -42,27 +45,8 @@ const BG: Record<Layout, string> = {
   grid: "#F7F8FB",
   reader: "#FFFCF6",
   "big-text": "#FFFFFF",
+  chat: "#F6F7FB",
 };
-
-const SPRING = { type: "spring", stiffness: 260, damping: 30 } as const;
-/** Records move after clutter starts leaving, 25ms stagger (§4.5 morphs 600–900ms). */
-const recT = (i: number): Transition => ({ layout: { ...SPRING, delay: 0.1 + i * 0.025 } });
-const chromeIn = {
-  initial: { opacity: 0, y: -6 },
-  animate: { opacity: 1, y: 0 },
-  transition: { delay: 0.5, duration: 0.35, ease: [0.22, 1, 0.36, 1] as const },
-};
-const clutterExit = {
-  initial: { opacity: 0, scale: 0.96, filter: "blur(6px)" },
-  animate: { opacity: 1, scale: 1, filter: "blur(0px)" },
-  exit: { opacity: 0, scale: 0.96, filter: "blur(6px)" },
-  transition: { duration: 0.25, ease: [0.22, 1, 0.36, 1] as const },
-};
-const fadeIn = (i = 0) => ({
-  initial: { opacity: 0 },
-  animate: { opacity: 1 },
-  transition: { delay: 0.32 + i * 0.02, duration: 0.3 },
-});
 
 /** "Source" selectors shown by tooltips (§7.3) — match the /playground/shopwise markup. */
 const PRODUCT_SELECTORS: Record<string, string> = {
@@ -154,9 +138,18 @@ export function MorphStage(props: Props) {
       <div className="d-stage-inner" data-ghosting={hover ? "" : undefined}>
         <LayoutGroup id={groupId}>
           <AnimatePresence>
-            {layout === "original" && (props.dataset === "videos" ? <StreamlyClutter key="clutter" /> : <ShopwiseClutter key="clutter" />)}
+            {layout === "original" &&
+              (props.dataset === "videos" ? (
+                <StreamlyClutter key="clutter" />
+              ) : props.dataset === "metrics" ? (
+                <PulseboardClutter key="clutter" records={props.records} />
+              ) : (
+                <ShopwiseClutter key="clutter" />
+              ))}
           </AnimatePresence>
-          {props.dataset === "videos" ? (
+          {props.dataset === "metrics" ? (
+            <MetricLayouts layout={layout} records={props.records} compact={compact} />
+          ) : props.dataset === "videos" ? (
             <VideoLayouts layout={layout} records={props.records} sort={sort} setSort={interactive ? setSort : undefined} deckSwipe={props.deckSwipe ?? 0} interactive={interactive} compact={compact} />
           ) : (
             <ProductLayouts
@@ -359,6 +352,8 @@ function VideoLayouts({
           ))}
         </div>
       );
+    default:
+      return null;
   }
 }
 
@@ -710,15 +705,6 @@ function ProductLayouts({
 }
 
 // ───────────────────────────── Clutter (the busy "before" pages) ─────────────────────────────
-
-function Clutter({ className, children, isStatic }: { className: string; children?: ReactNode; isStatic?: boolean }) {
-  if (isStatic) return <div className={className}>{children}</div>;
-  return (
-    <motion.div className={className} {...clutterExit}>
-      {children}
-    </motion.div>
-  );
-}
 
 function StreamlyClutter() {
   return (

@@ -92,3 +92,36 @@ export function formatViews(n: number) {
 
 export const formatPrice = (n: number) => `$${n % 1 === 0 ? n : n.toFixed(2)}`;
 export const formatCount = (n: number) => n.toLocaleString("en-US");
+
+export const monthNames: Record<string, string> = {
+  Jan: "January",
+  Feb: "February",
+  Mar: "March",
+  Apr: "April",
+  May: "May",
+  Jun: "June",
+  Jul: "July",
+  Aug: "August",
+  Sep: "September",
+  Oct: "October",
+  Nov: "November",
+  Dec: "December",
+};
+export const monthName = (m: string) => monthNames[m] ?? m;
+
+/** Headline numbers shown on Pulseboard — derived from `metrics`, so every view agrees. */
+export function metricKpis(ms: Metric[] = metrics) {
+  const revenue = ms.reduce((s, m) => s + m.revenue, 0);
+  const signups = ms.reduce((s, m) => s + m.signups, 0);
+  const churn = ms.reduce((s, m) => s + m.churn, 0) / ms.length;
+  const best = ms.reduce((a, b) => (b.revenue > a.revenue ? b : a));
+  const worstChurn = ms.reduce((a, b) => (b.churn > a.churn ? b : a));
+  return {
+    revenue: `$${(revenue / 1e6).toFixed(2)}M`,
+    signups: signups >= 1e4 ? `${(signups / 1e3).toFixed(1)}K` : signups.toLocaleString("en-US"),
+    churn: `${churn.toFixed(1)}%`,
+    bestMonth: best.month,
+    worstChurn,
+    lastChurn: ms[ms.length - 1],
+  };
+}

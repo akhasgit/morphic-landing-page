@@ -4,7 +4,7 @@ import { AnimatePresence, m as motion } from "motion/react";
 import { AlertTriangle, Check, Heart, MousePointer2, Undo2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Thumb } from "@/components/demo/Thumb";
-import { metrics, videos } from "@/demo/data";
+import { metrics, monthName, videos } from "@/demo/data";
 
 // Bento micro-animations (§7.6). Each mounts fresh per `run` (keyed by the parent),
 // so it plays on tile entry and replays in a loop while hovered.
@@ -266,19 +266,3 @@ export function ChartsMicro({ reduced }: { reduced: boolean }) {
     </div>
   );
 }
-
-const MONTHS: Record<string, string> = {
-  Jan: "January",
-  Feb: "February",
-  Mar: "March",
-  Apr: "April",
-  May: "May",
-  Jun: "June",
-  Jul: "July",
-  Aug: "August",
-  Sep: "September",
-  Oct: "October",
-  Nov: "November",
-  Dec: "December",
-};
-const monthName = (m: string) => MONTHS[m] ?? m;

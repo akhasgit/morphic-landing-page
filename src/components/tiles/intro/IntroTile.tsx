@@ -39,7 +39,7 @@ export function IntroTile() {
             </h1>
 
             <p className="hero-line reveal" style={cssVars({ i: 2 })}>
-              Turn this <span className="hero-line-feed">feed</span> into <RotatingLine />.
+              <RotatingLine />
             </p>
 
             <p className="body-copy hero-body reveal" style={cssVars({ i: 3 })}>
