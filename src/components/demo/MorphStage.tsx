@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, LayoutGroup, motion, type Transition } from "motion/react";
+import { AnimatePresence, LayoutGroup, m as motion, type Transition } from "motion/react";
 import { ArrowUpRight, ChevronDown, Heart, Search, ShoppingCart, Star, X } from "lucide-react";
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { formatCount, formatPrice, formatViews, type Product, type Video } from "@/demo/data";

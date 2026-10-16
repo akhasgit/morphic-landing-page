@@ -1,12 +1,15 @@
 "use client";
 
 import { ChevronDown, ChevronRight } from "lucide-react";
+import dynamic from "next/dynamic";
 import { Accordion } from "radix-ui";
 import { useState } from "react";
 import { faq } from "@/config/faq";
 import { cssVars } from "@/lib/css";
+import { useOnceTrue } from "@/lib/hooks";
 import { Ph } from "@/components/ui/Ph";
-import { Sheet } from "@/components/ui/Sheet";
+
+const Sheet = dynamic(() => import("@/components/ui/Sheet").then((mod) => mod.Sheet), { ssr: false });
 
 /**
  * Desktop: a two-column accordion with single-open behavior across both columns (two Radix
@@ -15,6 +18,7 @@ import { Sheet } from "@/components/ui/Sheet";
 export function Faq() {
   const [open, setOpen] = useState<string>("");
   const [sheet, setSheet] = useState<number | null>(null);
+  const sheetLoaded = useOnceTrue(sheet !== null);
   const columns = [faq.slice(0, 4), faq.slice(4)];
 
   return (
@@ -63,13 +67,15 @@ export function Faq() {
           </li>
         ))}
       </ul>
-      <Sheet open={sheet !== null} onOpenChange={(o) => !o && setSheet(null)} title={sheet !== null ? faq[sheet].q : ""}>
-        {sheet !== null && (
-          <p className="pb-2 text-[16px] leading-relaxed text-ink-2">
-            <Ph value={faq[sheet].a} />
-          </p>
-        )}
-      </Sheet>
+      {sheetLoaded && (
+        <Sheet open={sheet !== null} onOpenChange={(o) => !o && setSheet(null)} title={sheet !== null ? faq[sheet].q : ""}>
+          {sheet !== null && (
+            <p className="pb-2 text-[16px] leading-relaxed text-ink-2">
+              <Ph value={faq[sheet].a} />
+            </p>
+          )}
+        </Sheet>
+      )}
     </>
   );
 }

@@ -1,17 +1,20 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
-import { Check, X } from "lucide-react";
-import { Dialog } from "radix-ui";
+import { AnimatePresence, m as motion } from "motion/react";
+import { Check } from "lucide-react";
+import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { site } from "@/config/site";
 import { track } from "@/lib/analytics";
 import { cssVars } from "@/lib/css";
+import { useOnceTrue } from "@/lib/hooks";
 import { checkoutUrl, type Billing } from "@/lib/links";
-import { isSet, text } from "@/lib/placeholder";
+import { isSet } from "@/lib/placeholder";
 import { InstallButton } from "@/components/ui/InstallButton";
 import { Ph } from "@/components/ui/Ph";
-import { compareRows, plans, type PlanId } from "./plans";
+import { plans, type PlanId } from "./plans";
+
+const CompareDialog = dynamic(() => import("./CompareDialog"), { ssr: false });
 
 const SPRING = { type: "spring", stiffness: 300, damping: 30 } as const;
 
@@ -19,7 +22,8 @@ const SPRING = { type: "spring", stiffness: 300, damping: 30 } as const;
 function RollingPrice({ value }: { value: number }) {
   const digits = String(value).split("");
   return (
-    <span className="roll" aria-label={`$${value}`}>
+    <span className="roll">
+      <span className="sr-only">${value}</span>
       <span aria-hidden="true">$</span>
       <span className="roll-digits" aria-hidden="true">
         <AnimatePresence initial={false} mode="popLayout">
@@ -77,6 +81,7 @@ function PaidCta({ plan, billing, label, dark }: { plan: "pro" | "power"; billin
 export function Pricing() {
   const [billing, setBilling] = useState<Billing>("monthly");
   const [compare, setCompare] = useState(false);
+  const compareLoaded = useOnceTrue(compare);
   const scroller = useRef<HTMLDivElement>(null);
 
   // Mobile: Pro starts centered with Free and Power peeking.
@@ -162,78 +167,8 @@ export function Pricing() {
 
       {site.socialProof.length > 0 && <Marquee />}
 
-      <CompareDialog open={compare} onOpenChange={setCompare} />
+      {compareLoaded && <CompareDialog open={compare} onOpenChange={setCompare} />}
     </div>
-  );
-}
-
-function CompareDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
-  return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <AnimatePresence>
-        {open && (
-          <Dialog.Portal forceMount>
-            <Dialog.Overlay asChild forceMount>
-              <motion.div className="fixed inset-0 z-[90] bg-black/50 backdrop-blur-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />
-            </Dialog.Overlay>
-            <Dialog.Content asChild forceMount>
-              <motion.div
-                data-theme="light"
-                className="pr-dialog"
-                initial={{ opacity: 0, y: 16, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 8, scale: 0.98 }}
-                transition={SPRING}
-              >
-                <Dialog.Title className="h3 text-[22px] text-ink">Compare all features</Dialog.Title>
-                <Dialog.Description className="mt-1 text-[14.5px] text-ink-2">
-                  A morph is one request that creates or changes a view.
-                </Dialog.Description>
-                <div className="pr-table-wrap">
-                  <table className="pr-table">
-                    <thead>
-                      <tr>
-                        <th scope="col">
-                          <span className="sr-only">Feature</span>
-                        </th>
-                        {plans.map((p) => (
-                          <th key={p.id} scope="col" data-pro={p.id === "pro" || undefined}>
-                            {p.name}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {compareRows.map((r) => (
-                        <tr key={r.label}>
-                          <th scope="row">{r.label}</th>
-                          {r.values.map((v, i) => (
-                            <td key={i} data-pro={i === 1 || undefined}>
-                              {v === "✓" ? (
-                                <Check size={16} strokeWidth={2.5} className="pr-yes" aria-label="Included" />
-                              ) : v === "—" ? (
-                                <span className="pr-no" aria-label="Not included">
-                                  —
-                                </span>
-                              ) : (
-                                text(v)
-                              )}
-                            </td>
-                          ))}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                <Dialog.Close className="pr-dialog-close" aria-label="Close">
-                  <X size={18} />
-                </Dialog.Close>
-              </motion.div>
-            </Dialog.Content>
-          </Dialog.Portal>
-        )}
-      </AnimatePresence>
-    </Dialog.Root>
   );
 }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, m as motion } from "motion/react";
 import { MousePointer2, Pin, Puzzle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { AppIcon } from "../ui/AppIcon";

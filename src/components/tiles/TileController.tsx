@@ -69,11 +69,63 @@ export function TileController() {
     };
     document.addEventListener("focusin", onFocusIn);
 
+    // Snap assist (passive — never blocks or replaces native scrolling). Mouse wheels with
+    // precise deltas and short trackpad swipes use Chrome's "nearest snap point" strategy,
+    // so a deliberate small gesture can snap back to the tile it started on. When a vertical
+    // wheel gesture of ≥50px ends and native snap left us where we began, nudge one tile on.
+    const shortViewport = window.matchMedia("(max-height: 620px)");
+    const nearest = () => {
+      let best = 0;
+      let dist = Infinity;
+      sections.forEach((s, i) => {
+        const d = Math.abs(s.getBoundingClientRect().top);
+        if (d < dist) {
+          dist = d;
+          best = i;
+        }
+      });
+      return best;
+    };
+    let gestureStart = -1;
+    let gestureSum = 0;
+    let gestureTimer = 0;
+    let checkTimer = 0;
+    const onWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY) || shortViewport.matches) return;
+      if ((e.target as Element | null)?.closest?.('[role="dialog"]')) return;
+      if (gestureStart < 0) {
+        gestureStart = nearest();
+        gestureSum = 0;
+      }
+      gestureSum += e.deltaMode === 1 ? e.deltaY * 40 : e.deltaMode === 2 ? e.deltaY * window.innerHeight : e.deltaY;
+      window.clearTimeout(gestureTimer);
+      window.clearTimeout(checkTimer);
+      gestureTimer = window.setTimeout(() => {
+        const start = gestureStart;
+        const dir = Math.sign(gestureSum);
+        const big = Math.abs(gestureSum) >= 50;
+        gestureStart = -1;
+        // Give native snapping a moment to settle, then check where it landed.
+        checkTimer = window.setTimeout(() => {
+          if (!big || nearest() !== start) return;
+          const target = start + dir;
+          if (target >= 0 && target < sections.length) {
+            const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+            sections[target].scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+          }
+        }, 240);
+      }, 170);
+    };
+    window.addEventListener("wheel", onWheel, { passive: true });
+
     return () => {
       io.disconnect();
       window.clearTimeout(settleTimer);
+      window.clearTimeout(gestureTimer);
+      window.clearTimeout(checkTimer);
       document.removeEventListener("visibilitychange", onVisibility);
       document.removeEventListener("focusin", onFocusIn);
+      window.removeEventListener("wheel", onWheel);
     };
   }, []);
 

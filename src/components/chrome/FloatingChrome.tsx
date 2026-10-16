@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, m as motion } from "motion/react";
 import { tileIndex } from "@/config/tiles";
 import { track } from "@/lib/analytics";
 import { jumpToTile, useTileStore } from "@/store/tiles";

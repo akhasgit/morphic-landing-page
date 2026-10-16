@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, m as motion } from "motion/react";
 import { useHeroStore } from "@/store/hero";
 
 export const HERO_LINES = ["a grid of circles", "swipeable cards", "a table sorted by views"];

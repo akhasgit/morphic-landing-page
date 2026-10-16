@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion, useMotionTemplate, useMotionValue, useSpring, type MotionValue } from "motion/react";
+import { AnimatePresence, m as motion, useMotionTemplate, useMotionValue, useSpring, type MotionValue } from "motion/react";
 import { Check, Pause, Play } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { dotBus } from "@/components/dotfield/bus";

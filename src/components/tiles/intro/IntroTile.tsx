@@ -20,7 +20,7 @@ export function IntroTile() {
       <div className="tile-content hero-content">
         <div className="hero-grid">
           <div id="hero-copy" className="hero-copy">
-            <div className="reveal intro-fade" style={cssVars({ i: 0, d: "700ms" })}>
+            <div className="reveal" style={cssVars({ i: 0 })}>
               <StoreLink tile="intro-eyebrow" className="hero-eyebrow glass">
                 <span className="live-dot" aria-hidden="true" />
                 Now on the Chrome Web Store <span aria-hidden="true">→</span>
@@ -38,20 +38,20 @@ export function IntroTile() {
               ))}
             </h1>
 
-            <p className="hero-line reveal intro-fade" style={cssVars({ i: 2, d: "860ms" })}>
+            <p className="hero-line reveal" style={cssVars({ i: 2 })}>
               Turn this <span className="hero-line-feed">feed</span> into <RotatingLine />.
             </p>
 
-            <p className="body-copy hero-body reveal intro-fade" style={cssVars({ i: 3, d: "940ms" })}>
+            <p className="body-copy hero-body reveal" style={cssVars({ i: 3 })}>
               Morphic is a Chrome extension that rebuilds the page you&rsquo;re on into the interface you describe — using the site&rsquo;s
               real, live data. Undo anything. Flip back to the original in one click.
             </p>
 
-            <div className="reveal intro-fade" style={cssVars({ i: 4, d: "1020ms" })}>
+            <div className="reveal" style={cssVars({ i: 4 })}>
               <HeroCtas />
             </div>
 
-            <p className="hero-micro reveal intro-fade" style={cssVars({ i: 5, d: "1080ms" })}>
+            <p className="hero-micro reveal" style={cssVars({ i: 5 })}>
               Free plan · No credit card · <Ph value={site.supportedBrowsers} />
             </p>
           </div>

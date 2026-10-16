@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion, useMotionValueEvent, type MotionValue } from "motion/react";
+import { AnimatePresence, m as motion, useMotionValueEvent, type MotionValue } from "motion/react";
 import { Check, ChevronRight, MousePointer2, Plus, Send } from "lucide-react";
 import { useState } from "react";
 import { AppIcon } from "../ui/AppIcon";

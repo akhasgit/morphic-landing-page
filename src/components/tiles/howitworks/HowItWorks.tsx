@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion, useMotionValue } from "motion/react";
+import { AnimatePresence, m as motion, useMotionValue } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { cssVars } from "@/lib/css";
 import { useIsDesktop } from "@/lib/hooks";

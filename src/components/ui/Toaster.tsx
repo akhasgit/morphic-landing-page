@@ -1,7 +1,7 @@
 "use client";
 
 import { Check } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, m as motion } from "motion/react";
 import { useUi } from "@/store/ui";
 
 export function Toaster() {

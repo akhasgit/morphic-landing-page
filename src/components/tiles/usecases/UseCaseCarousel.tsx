@@ -3,7 +3,7 @@
 import {
   animate,
   AnimatePresence,
-  motion,
+  m as motion,
   useMotionValue,
   useMotionValueEvent,
   useSpring,

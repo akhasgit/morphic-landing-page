@@ -1,21 +1,24 @@
 "use client";
 
-import { AnimatePresence, motion, motionValue } from "motion/react";
+import { AnimatePresence, m as motion, motionValue } from "motion/react";
+import dynamic from "next/dynamic";
 import { useState } from "react";
 import { pad2, tiles } from "@/config/tiles";
 import { track } from "@/lib/analytics";
 import { innerProgress, jumpToTile, sequenceTiles, useTileStore } from "@/store/tiles";
+import { useOnceTrue } from "@/lib/hooks";
 import { InstallButton } from "../ui/InstallButton";
-import { Sheet } from "../ui/Sheet";
 import { useThemeAt } from "./useThemeAt";
 
 const FULL = motionValue(1);
+const Sheet = dynamic(() => import("../ui/Sheet").then((mod) => mod.Sheet), { ssr: false });
 
 /** Bottom glass dock with story-style segments (§6.6). Hidden on the hero. */
 export function MobileDock() {
   const active = useTileStore((s) => s.activeIndex);
   const theme = useThemeAt("bottom");
   const [sheet, setSheet] = useState(false);
+  const sheetLoaded = useOnceTrue(sheet);
   const visible = active > 0;
   const activeId = tiles[active].id;
 
@@ -65,6 +68,7 @@ export function MobileDock() {
         <InstallButton tile="dock" size="sm" short className="h-10 rounded-[12px] px-4" />
       </motion.div>
 
+      {sheetLoaded && (
       <Sheet open={sheet} onOpenChange={setSheet} title="Sections">
         <ul className="-mx-2 grid gap-0.5 pb-1">
           {tiles.map((t, k) => (
@@ -87,6 +91,7 @@ export function MobileDock() {
           ))}
         </ul>
       </Sheet>
+      )}
     </div>
   );
 }

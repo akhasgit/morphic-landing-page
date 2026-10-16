@@ -40,3 +40,12 @@ export function useInterval(cb: () => void, ms: number | null) {
     return () => window.clearInterval(id);
   }, [cb, ms]);
 }
+
+/** True from the first time `value` is true onward (mount-on-first-open for lazy dialogs). */
+export function useOnceTrue(value: boolean) {
+  const [seen, setSeen] = useState(value);
+  useEffect(() => {
+    if (value) setSeen(true);
+  }, [value]);
+  return seen || value;
+}

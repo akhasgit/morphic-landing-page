@@ -1,7 +1,7 @@
 "use client";
 
 import { X } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, m as motion } from "motion/react";
 import { Dialog } from "radix-ui";
 import { site } from "@/config/site";
 import { demoVideoConfigured } from "@/lib/links";

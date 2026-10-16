@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, m as motion } from "motion/react";
 import { Check, Heart, MousePointer2, ShieldAlert, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Thumb } from "@/components/demo/Thumb";

@@ -610,11 +610,12 @@ button {
 
 /* ───────────────────────────── First-visit intro (§7.1) ───────────────────────────── */
 
+/* Starts faint (not invisible) so the headline is painted at first paint — LCP-safe. */
 @keyframes word-rise {
   from {
-    opacity: 0;
+    opacity: 0.18;
     transform: translate3d(0, 0.38em, 0);
-    filter: blur(8px);
+    filter: blur(10px);
   }
   to {
     opacity: 1;
@@ -637,7 +638,7 @@ button {
 }
 html[data-intro="play"] .intro-word {
   animation: word-rise 720ms var(--ease-out) backwards;
-  animation-delay: calc(440ms + var(--w, 0) * 60ms);
+  animation-delay: calc(300ms + var(--w, 0) * 60ms);
 }
 html[data-intro="play"] .intro-fade {
   animation: intro-fade-up 700ms var(--ease-out) backwards;
