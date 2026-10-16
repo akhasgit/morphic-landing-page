@@ -604,6 +604,7 @@ uniform float uBreath;
 uniform vec2 uBreathCenter;
 uniform float uGlow;
 uniform float uFormGlow;
+uniform float uActiveScale; // <1 while the intro plays so in-flight dots stay light
 out vec4 vColor;
 out float vSize;
 out float vRad;
@@ -617,12 +618,12 @@ void main() {
     p += d / max(length(d), 1.0) * uBreath;
   }
   float m = length(aPos - aHome);
-  float t = min(m / 24.0, 1.0);
-  float r = uRadius * aSizeVar * (0.72 + 0.28 * aDepth) * (1.0 + min(m / 18.0, 1.4));
+  float t = min(m / 24.0, 1.0) * uActiveScale;
+  float r = uRadius * aSizeVar * (0.72 + 0.28 * aDepth) * (1.0 + min(m / 18.0, 1.4) * uActiveScale);
   r *= mix(1.0, 1.15, aKind);
   vec4 base = mix(uBase, uForm, aKind);
   vec3 rgb = mix(base.rgb, uActive.rgb, t);
-  float a = mix(base.a * aAlpha, uActive.a * mix(aAlpha, 1.0, 0.55), t);
+  float a = mix(base.a * aAlpha, uActive.a * mix(aAlpha, 1.0, 0.25), t);
   vColor = vec4(rgb, a);
   float glow = max(uGlow * t, uFormGlow * aKind);
   vGlow = glow;
@@ -687,7 +688,7 @@ class GLRenderer implements Renderer {
     gl.linkProgram(prog);
     if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog) ?? "link");
     this.prog = prog;
-    for (const n of ["uRes", "uDpr", "uTime", "uRadius", "uBase", "uActive", "uForm", "uBreath", "uBreathCenter", "uGlow", "uFormGlow"]) {
+    for (const n of ["uRes", "uDpr", "uTime", "uRadius", "uBase", "uActive", "uForm", "uBreath", "uBreathCenter", "uGlow", "uFormGlow", "uActiveScale"]) {
       this.u[n] = gl.getUniformLocation(prog, n);
     }
     this.vao = gl.createVertexArray()!;
@@ -752,6 +753,7 @@ class GLRenderer implements Renderer {
     gl.uniform2f(u.uBreathCenter, e.formationCenter.x, e.formationCenter.y);
     gl.uniform1f(u.uGlow, t.glow);
     gl.uniform1f(u.uFormGlow, t.formGlow);
+    gl.uniform1f(u.uActiveScale, e.introPlaying ? 0.4 : 1);
     gl.bindVertexArray(this.vao);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.dyn);
     gl.bufferSubData(gl.ARRAY_BUFFER, 0, e.pos);
@@ -826,7 +828,7 @@ class Canvas2DRenderer implements Renderer {
       const hx = home[i * 2];
       const hy = home[i * 2 + 1];
       const m = Math.hypot(x - hx, y - hy);
-      const tt = Math.min(m / 24, 1);
+      const tt = Math.min(m / 24, 1) * (e.introPlaying ? 0.4 : 1);
       if (!e.reducedMotion) {
         x += Math.sin(time * 0.6 + seed[i]) * 0.15;
         y += Math.cos(time * 0.53 + seed[i] * 1.7) * 0.15;
@@ -841,7 +843,7 @@ class Canvas2DRenderer implements Renderer {
       }
       const r = e.cfg.radius * sizeVar[i] * (0.72 + 0.28 * depth[i]) * (1 + Math.min(m / 18, 1.4)) * (isForm ? 1.15 : 1);
       const baseA = isForm ? t.form[3] : t.base[3] * alpha[i];
-      const a = baseA + (t.active[3] * (alpha[i] + (1 - alpha[i]) * 0.55) - baseA) * tt;
+      const a = baseA + (t.active[3] * (alpha[i] + (1 - alpha[i]) * 0.25) - baseA) * tt;
       if (a < 0.01) continue;
       ctx.globalAlpha = Math.min(1, a);
       const sprite = isForm && tt < 0.3 ? this.sprites[STEPS] : this.sprites[Math.round(tt * (STEPS - 1))];

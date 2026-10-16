@@ -28,8 +28,8 @@ type Props = {
   layout?: keyof typeof formationLayouts;
   /** "logo-burst" only plays on the first visit of the session (html[data-intro=play]). */
   intro?: IntroKind;
-  /** Elements whose area keeps dots dim so text stays crisp. */
-  textSafe?: RefObject<HTMLElement | null>[];
+  /** Elements whose area keeps dots dim so text stays crisp (refs, or a CSS selector). */
+  textSafe?: RefObject<HTMLElement | null>[] | string;
   config?: DotFieldConfig;
   className?: string;
   onEngine?: (engine: DotFieldEngine | null) => void;
@@ -69,8 +69,12 @@ export function DotField({ theme, active, formation, layout = "final", intro = "
     };
     const textRects = (): Rect[] => {
       const base = canvas.getBoundingClientRect();
-      return (textSafe ?? [])
-        .map((r) => r.current?.getBoundingClientRect())
+      const els =
+        typeof textSafe === "string"
+          ? Array.from(document.querySelectorAll<HTMLElement>(textSafe))
+          : (textSafe ?? []).map((r) => r.current);
+      return els
+        .map((el) => el?.getBoundingClientRect())
         .filter((r): r is DOMRect => !!r && r.width > 0)
         .map((r) => ({ x: r.left - base.left, y: r.top - base.top, w: r.width, h: r.height }));
     };
@@ -113,12 +117,12 @@ export function DotField({ theme, active, formation, layout = "final", intro = "
     }
 
     // First-visit intro: dots start packed in the "M", then burst to the grid.
-    if (intro === "logo-burst" && document.documentElement.dataset.intro === "play") {
-      const deadline = performance.now() + 500;
+    // The CSS word-rise starts at first paint; if hydration came too late to lead it, skip
+    // the burst rather than play it out of sync (the field just fades in).
+    if (intro === "logo-burst" && document.documentElement.dataset.intro === "play" && performance.now() < 1100) {
       loadImageMask(site.brand.mark)
         .then((mask) => {
-          // If the mark arrived late, skip the intro rather than fight the text animation.
-          if (!cancelled && performance.now() < deadline && performance.now() < 2200) engine.playIntro("logo-burst", mask);
+          if (!cancelled && performance.now() < 1300) engine.playIntro("logo-burst", mask);
         })
         .catch(() => {});
     }

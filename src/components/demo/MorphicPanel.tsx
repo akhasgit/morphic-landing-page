@@ -114,8 +114,14 @@ function Item({ item, clock, onUndo, interactive }: { item: ChatItem; clock: Mot
         <div className="mp-version">
           <span className="mp-v">v{item.v}</span>
           <span className="mp-vsum">{item.summary}</span>
-          <button type="button" className="mp-undo" onClick={onUndo} disabled={!onUndo} tabIndex={interactive && onUndo ? 0 : -1}>
-            Undo
+          <button
+            type="button"
+            className="mp-undo"
+            onClick={onUndo}
+            disabled={!onUndo || item.undone}
+            tabIndex={interactive && onUndo && !item.undone ? 0 : -1}
+          >
+            {item.undone ? "Undone" : "Undo"}
           </button>
         </div>
       );

@@ -122,7 +122,7 @@
 .d-frame-panel {
   position: relative;
   flex: none;
-  width: 37%;
+  width: 38%;
   min-width: 0;
   border-left: 1px solid #222226;
   background: #0f0f12;
@@ -1472,15 +1472,15 @@ span.d-td-views {
   flex: none;
   display: flex;
   align-items: center;
-  gap: 0.15em;
-  padding: 0 0.75em;
+  gap: 0;
+  padding: 0 0.6em;
   border-bottom: 1px solid #2b2b33;
 }
 .mp-tabs > span {
-  font-size: 0.9em;
+  font-size: 0.86em;
   font-weight: 550;
   color: #8a8a96;
-  padding: 0.55em 0.6em;
+  padding: 0.6em 0.5em;
   border-bottom: 2px solid transparent;
   margin-bottom: -1px;
   white-space: nowrap;

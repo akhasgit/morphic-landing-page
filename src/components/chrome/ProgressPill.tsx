@@ -37,7 +37,7 @@ export function ProgressPill() {
   const reduced = useReducedMotion();
   const [open, setOpen] = useState(false);
   const [flash, setFlash] = useState<{ index: number; key: number } | null>(null);
-  const firstRender = useRef(true);
+  const prevActive = useRef(active);
 
   const capY = useSpring(slotTop(active, active), { stiffness: 420, damping: 30 });
   const velocity = useVelocity(capY);
@@ -51,10 +51,8 @@ export function ProgressPill() {
 
   // Label flash on every tile change (not on first load).
   useEffect(() => {
-    if (firstRender.current) {
-      firstRender.current = false;
-      return;
-    }
+    if (prevActive.current === active) return;
+    prevActive.current = active;
     setFlash({ index: active, key: Date.now() });
     const t = window.setTimeout(() => setFlash(null), 1800);
     return () => window.clearTimeout(t);

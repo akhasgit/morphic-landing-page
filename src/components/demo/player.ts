@@ -27,7 +27,12 @@ export type DemoEvent =
   | { at: number; type: "caption"; text: string | null }
   | { at: number; type: "deckSwipe" }
   | { at: number; type: "sort"; sort: SortState }
+  // Extra: the version chip's Undo — back to the previous layout.
+  | { at: number; type: "undo" }
   | { at: number; type: "reset" };
+
+/** A DemoEvent without its timestamp (distributes over the union). */
+export type DemoEventInput = DemoEvent extends infer E ? (E extends DemoEvent ? Omit<E, "at"> & { at?: number } : never) : never;
 
 export type Step = {
   id: string;
@@ -160,6 +165,19 @@ function reduce(s: DemoState, ev: DemoEvent, plan: Map<string, number>): DemoSta
       return { ...s, deckSwipe: s.deckSwipe + 1 };
     case "sort":
       return { ...s, sort: ev.sort };
+    case "undo": {
+      const history = s.history.length > 1 ? s.history.slice(0, -1) : ["original" as Layout];
+      const prev = history[history.length - 1];
+      let marked = false;
+      const items = [...s.items].reverse().map((it) => {
+        if (!marked && it.kind === "version" && !it.undone) {
+          marked = true;
+          return { ...it, undone: true };
+        }
+        return it;
+      });
+      return { ...s, layout: prev, versionLayout: prev, toggle: true, caption: null, history, items: items.reverse() };
+    }
   }
 }
 
@@ -220,7 +238,7 @@ export class DemoPlayer {
     this.emit();
   }
 
-  dispatch(ev: Omit<DemoEvent, "at"> & { at?: number }) {
+  dispatch(ev: DemoEventInput) {
     this.state = reduce(this.state, { ...ev, at: ev.at ?? this.elapsed } as DemoEvent, this.plan);
     this.emit();
   }
