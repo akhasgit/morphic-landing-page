@@ -381,21 +381,30 @@
     width: 100%;
   }
   .pr-sub {
-    font-size: 14px;
+    font-size: 13.5px;
+    margin-top: 6px;
+  }
+  .pr-h2 {
+    margin-top: 8px;
   }
   .pr {
     align-items: flex-start;
   }
   .pr-toggle {
-    margin-top: 14px;
+    margin-top: 12px;
+  }
+  .pr-toggle-btn {
+    height: 30px;
+    padding: 0 12px;
+    font-size: 13.5px;
   }
   .pr-cards {
     display: flex;
     gap: 12px;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
-    margin-top: 26px;
-    padding: 14px var(--gutter) 6px;
+    margin-top: 12px;
+    padding: 14px var(--gutter) 4px;
     margin-inline: calc(var(--gutter) * -1);
     width: calc(100% + var(--gutter) * 2);
     max-width: none;
@@ -406,19 +415,48 @@
     width: 76vw;
     max-width: 340px;
     scroll-snap-align: center;
-    padding: 18px;
+    padding: 16px;
+  }
+  .plan-name {
+    font-size: 18px;
+  }
+  .plan-line {
+    font-size: 13px;
+  }
+  .plan-price {
+    margin-top: 10px;
+  }
+  .roll {
+    font-size: 32px;
+  }
+  .plan-sub {
+    font-size: 12px;
+    margin-top: 4px;
+  }
+  .plan-cta {
+    margin-top: 12px;
   }
   .plan-pro,
   [data-revealed="true"] .plan-pro.reveal {
     transform: none;
   }
   .plan-includes {
-    gap: 7px;
-    font-size: 13.5px;
+    margin-top: 12px;
+    gap: 5px;
+    font-size: 13px;
   }
   .pr-foot {
+    margin-top: 10px;
     justify-content: flex-start;
-    gap: 6px 14px;
-    font-size: 12.5px;
+    gap: 4px 12px;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+}
+
+/* Short phones: the billing sub-line repeats the toggle + trust row, so it goes first. */
+@media (max-width: 1023px) and (max-height: 760px) {
+  .plan-sub {
+    display: none;
   }
 }
