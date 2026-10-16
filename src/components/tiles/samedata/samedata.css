@@ -1,0 +1,221 @@
+/* ───────── Tile 03 — Same data (§7.3) ───────── */
+
+.sd-grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: 24px;
+  align-items: center;
+}
+.sd-copy {
+  grid-column: 1 / span 4;
+  min-width: 0;
+}
+.sd-h2 {
+  margin-top: 14px;
+}
+.sd-body {
+  margin-top: clamp(12px, 2.2vh, 20px);
+}
+.sd-proof {
+  margin-top: clamp(16px, 3vh, 28px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.sd-proof-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 14.5px;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+.sd-proof-item b {
+  color: var(--ink);
+  font-weight: 600;
+}
+.sd-proof-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid var(--light-border);
+  color: var(--accent);
+  box-shadow: 0 1px 2px rgba(30, 16, 80, 0.06);
+}
+.sd-proof-line {
+  display: none;
+}
+.sd-visual {
+  grid-column: 5 / span 8;
+  align-self: stretch;
+  min-height: 0;
+  display: flex;
+}
+
+.sd-demo {
+  --switch-h: 38px;
+  --gap: clamp(12px, 2vh, 18px);
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  container-type: size;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--gap);
+}
+.sd-switch-row {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+.sd-switch-label {
+  font-size: 15px;
+  font-weight: 550;
+  color: var(--ink-3);
+  transition: color 250ms;
+  min-width: 4.5em;
+}
+.sd-switch-label:first-child {
+  text-align: right;
+}
+.sd-switch-label.is-on {
+  color: var(--ink);
+}
+
+/* The panel toggle at 2× */
+.sd-switch {
+  position: relative;
+  flex: none;
+  width: 68px;
+  height: 38px;
+  padding: 0;
+  border-radius: 9999px;
+  border: 2px solid #d4d4d8;
+  background: #e4e4e7;
+  transition:
+    background-color 250ms,
+    border-color 250ms;
+}
+.sd-switch[data-state="checked"] {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.sd-switch-thumb {
+  display: block;
+  width: 26px;
+  height: 26px;
+  margin-left: 4px;
+  border-radius: 9999px;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(10, 10, 11, 0.25);
+  transition: transform 300ms var(--ease-out);
+}
+.sd-switch-thumb[data-state="checked"] {
+  transform: translateX(30px);
+}
+/* Pulses until first touched */
+.sd-switch[data-untouched]::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 9999px;
+  border: 2px solid rgba(99, 102, 241, 0.55);
+  animation: sd-pulse 1.8s var(--ease-out) infinite;
+  pointer-events: none;
+}
+@keyframes sd-pulse {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.94);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.18);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sd-switch[data-untouched]::after {
+    animation: none;
+    opacity: 0.6;
+  }
+}
+
+.sd-frame-wrap {
+  flex: none;
+  display: flex;
+  justify-content: center;
+}
+.sd-frame {
+  width: min(100cqw, (100cqh - var(--switch-h) - var(--gap)) * 1.5);
+  aspect-ratio: 1.5;
+  box-shadow: 0 30px 70px -36px rgba(30, 16, 80, 0.35);
+}
+.sd-live {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  padding: 0.25em 0.75em 0.25em 0.6em;
+  border-radius: 9999px;
+  background: rgba(74, 222, 128, 0.12);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  color: #d1fae5;
+  font-size: 0.9em;
+  font-weight: 600;
+}
+.sd-live .live-dot {
+  width: 6px;
+  height: 6px;
+}
+
+@media (max-width: 1023px) {
+  .sd-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+  .sd-h2 {
+    margin-top: 10px;
+  }
+  .sd-body {
+    font-size: 15px;
+    margin-top: 10px;
+  }
+  .sd-proof {
+    display: none;
+  }
+  .sd-frame {
+    width: 100cqw;
+    height: calc(100cqh - var(--switch-h) - var(--gap));
+    aspect-ratio: auto;
+  }
+  .sd-proof-line {
+    display: block;
+    margin-top: 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: -0.01em;
+    color: var(--ink-2);
+  }
+  .sd-visual {
+    flex: 1;
+    min-height: 0;
+  }
+  .sd-switch-row {
+    justify-content: flex-start;
+  }
+  .sd-switch-label:first-child {
+    text-align: left;
+    min-width: 0;
+  }
+}
