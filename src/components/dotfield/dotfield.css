@@ -1,0 +1,36 @@
+.dotfield {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+}
+
+/* Soft violet halo that follows the cursor under the canvas (transform only). */
+.dotfield-halo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 240px;
+  height: 240px;
+  border-radius: 9999px;
+  background: radial-gradient(circle at center, var(--hero-halo) 0%, transparent 70%);
+  opacity: 0;
+  will-change: transform, opacity;
+  transform: translate3d(-999px, -999px, 0);
+}
+[data-theme-dots="midnight"] .dotfield-halo {
+  background: radial-gradient(circle at center, var(--mid-halo) 0%, transparent 70%);
+}
+
+.dotfield-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 400ms ease;
+}
+.dotfield[data-ready] .dotfield-canvas {
+  opacity: 1;
+}
