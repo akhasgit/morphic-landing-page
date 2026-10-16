@@ -11,6 +11,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { pad2, tiles } from "@/config/tiles";
 import { track } from "@/lib/analytics";
+import { useIsoLayoutEffect } from "@/lib/hooks";
 import { innerProgress, jumpToTile, sequenceTiles, useTileStore } from "@/store/tiles";
 import { useThemeAt } from "./useThemeAt";
 
@@ -45,9 +46,22 @@ export function ProgressPill() {
   const thin = useTransform(stretch, (s) => 1 / Math.sqrt(s));
 
   useEffect(() => {
-    if (reduced) capY.jump(slotTop(active, active));
-    else capY.set(slotTop(active, active));
+    const target = slotTop(active, active);
+    if (reduced) capY.jump(target);
+    else capY.set(target);
   }, [active, capY, reduced]);
+
+  // The capsule's transform is written straight from its motion values (not via an m.div), so
+  // it renders correctly even before Motion's lazy features load — e.g. landing on a #deep-link.
+  const capRef = useRef<HTMLDivElement>(null);
+  useIsoLayoutEffect(() => {
+    const apply = () => {
+      if (capRef.current) capRef.current.style.transform = `translateY(${capY.get()}px) scaleX(${thin.get()}) scaleY(${stretch.get()})`;
+    };
+    apply();
+    const offs = [capY.on("change", apply), stretch.on("change", apply), thin.on("change", apply)];
+    return () => offs.forEach((off) => off());
+  }, [capY, stretch, thin]);
 
   // Label flash on every tile change (not on first load).
   useEffect(() => {
@@ -103,9 +117,9 @@ export function ProgressPill() {
           </motion.button>
         ))}
 
-        <motion.div className="pill-capsule" style={{ y: capY, scaleY: stretch, scaleX: thin }} aria-hidden="true">
+        <div ref={capRef} className="pill-capsule" aria-hidden="true">
           {sequenceTiles.has(activeId) && <motion.div className="pill-capsule-fill" style={{ scaleY: fill }} />}
-        </motion.div>
+        </div>
 
         <AnimatePresence>
           {open && (

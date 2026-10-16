@@ -1,18 +1,17 @@
 "use client";
 
-import { LazyMotion, MotionConfig, type FeatureBundle } from "motion/react";
+import { LazyMotion, MotionConfig } from "motion/react";
 import dynamic from "next/dynamic";
 import type { ReactNode } from "react";
 import { demoVideoConfigured } from "@/lib/links";
 import { useOnceTrue } from "@/lib/hooks";
+import { markMotionFeaturesReady, motionFeaturesReady } from "@/lib/motion-ready";
 import { useUi } from "@/store/ui";
 import { Toaster } from "./Toaster";
 
 // Motion's animation/gesture/layout features arrive right after hydration, not in the landing
 // bundle: <MotionFeatures> (a next/dynamic chunk) resolves the promise LazyMotion waits on.
-let resolveFeatures: (f: FeatureBundle) => void = () => {};
-const featuresReady = new Promise<FeatureBundle>((r) => (resolveFeatures = r));
-const loadFeatures = () => featuresReady;
+const loadFeatures = () => motionFeaturesReady;
 const MotionFeatures = dynamic(() => import("./MotionFeatures"), { ssr: false });
 
 // Dialogs (Radix) load the first time they're opened.
@@ -27,7 +26,7 @@ export function Providers({ children }: { children: ReactNode }) {
     <LazyMotion features={loadFeatures}>
       <MotionConfig reducedMotion="user">
         {children}
-        <MotionFeatures onLoad={resolveFeatures} />
+        <MotionFeatures onLoad={markMotionFeaturesReady} />
         {showEmail && <EmailSheet />}
         {showVideo && demoVideoConfigured && <VideoDialog />}
         <Toaster />
