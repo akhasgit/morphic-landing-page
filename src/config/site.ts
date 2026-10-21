@@ -3,14 +3,19 @@
 // the site renders the text inside the braces so previews look right, and
 // /dev/launch-checklist lists every value that still has braces.
 
+// The account dashboard is built into this app at /account. Use a full URL once it moves to its own domain.
+const accountUrl = "/account";
+
 export const site = {
   name: "Morphic",
   tagline: "Tell any website how to look.",
   url: "{{https://YOUR_DOMAIN}}",
   chromeStoreUrl: "{{CHROME_WEB_STORE_LISTING_URL}}",
+  accountUrl,
+  // Paid CTAs sign people in on the account page, then open Stripe Checkout (7-day trial, card collected up front).
   checkout: {
-    pro: { monthly: "{{PRO_MONTHLY_CHECKOUT_URL}}", yearly: "{{PRO_YEARLY_CHECKOUT_URL}}" },
-    power: { monthly: "{{POWER_MONTHLY_CHECKOUT_URL}}", yearly: "{{POWER_YEARLY_CHECKOUT_URL}}" },
+    pro: { monthly: `${accountUrl}/upgrade?plan=pro&interval=month`, yearly: `${accountUrl}/upgrade?plan=pro&interval=year` },
+    power: { monthly: `${accountUrl}/upgrade?plan=power&interval=month`, yearly: `${accountUrl}/upgrade?plan=power&interval=year` },
   },
   demoVideo: { src: "{{/video/morphic-demo.mp4}}", poster: "{{/video/morphic-demo-poster.jpg}}" },
   emailCaptureEndpoint: "{{FORM_OR_API_ENDPOINT}}",

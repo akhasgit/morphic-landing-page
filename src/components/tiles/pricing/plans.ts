@@ -20,8 +20,8 @@ export const plans = [
     line: "For everyday browsing, your way.",
     monthly: num(site.pricing.pro.monthly),
     yearly: num(site.pricing.pro.yearly),
-    includes: [`${text(site.pricing.pro.morphs)} morphs/month`, "Unlimited saved views", "Self-repairing views", "Charts & chat over data"],
-    cta: "Get Pro",
+    includes: ["Free for 7 days, then billed", `${text(site.pricing.pro.morphs)} morphs/month`, "Unlimited saved views", "Self-repairing views", "Charts & chat over data"],
+    cta: "Try free for 7 days",
   },
   {
     id: "power" as const,
@@ -29,8 +29,8 @@ export const plans = [
     line: "For people who morph everything.",
     monthly: num(site.pricing.power.monthly),
     yearly: num(site.pricing.power.yearly),
-    includes: [`${text(site.pricing.power.morphs)} morphs/month`, "Everything in Pro", "Early access to new view types", "Priority support"],
-    cta: "Go Power",
+    includes: ["Free for 7 days, then billed", `${text(site.pricing.power.morphs)} morphs/month`, "Everything in Pro", "Early access to new view types", "Priority support"],
+    cta: "Try free for 7 days",
   },
 ];
 
