@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, m as motion } from "motion/react";
+import { site } from "@/config/site";
 import { tileIndex } from "@/config/tiles";
 import { track } from "@/lib/analytics";
 import { jumpToTile, useTileStore } from "@/store/tiles";
@@ -42,6 +43,13 @@ export function FloatingChrome() {
             }}
           >
             Pricing
+          </a>
+          <a
+            href={site.accountUrl}
+            className="rounded-full px-3 py-2 text-[14px] font-medium text-ink-2 transition-colors hover:text-ink"
+            onClick={() => track("pill_nav", { to: "account", from: "top-bar" })}
+          >
+            Manage account
           </a>
           <AnimatePresence initial={false}>
             {active > 0 && (

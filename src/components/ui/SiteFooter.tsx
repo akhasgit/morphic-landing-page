@@ -9,6 +9,7 @@ export function SiteFooter({ home = false, className = "" }: { home?: boolean; c
   const links = [
     { label: "Use cases", href: home ? "#use-cases" : "/#use-cases" },
     { label: "Pricing", href: home ? "#pricing" : "/#pricing" },
+    { label: "Manage account", href: site.accountUrl },
     { label: "Privacy", href: "/privacy" },
     { label: "Terms", href: "/terms" },
   ];
