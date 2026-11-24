@@ -14,6 +14,8 @@ function back(path: string, params: Record<string, string>): never {
 }
 
 export async function signOut(): Promise<void> {
+  const token = await sessionToken();
+  if (token) await api("/v1/auth/logout", { method: "POST", token }).catch(() => {});
   await clearSessionCookie();
   redirect("/account/signin");
 }
@@ -69,4 +71,28 @@ export async function removeKey(): Promise<void> {
     back("/account/key", { error: (e as Error).message });
   }
   back("/account/key", { removed: "1" });
+}
+
+
+export async function redeemCode(formData: FormData): Promise<void> {
+  const token = await tokenOr("/account/billing");
+  try {
+    await api("/v1/access-codes/redeem", { method: "POST", token, body: { code: String(formData.get("code") ?? "").trim() } });
+  } catch (e) { back("/account/billing", { error: (e as Error).message }); }
+  back("/account/billing", { redeemed: "1" });
+}
+
+export async function deleteConversation(formData: FormData): Promise<void> {
+  const token = await tokenOr("/account/history");
+  try { await api(`/v1/conversations/${encodeURIComponent(String(formData.get("sessionId") ?? ""))}`, { method: "DELETE", token }); }
+  catch (e) { back("/account/history", { error: (e as Error).message }); }
+  back("/account/history", { deleted: "1" });
+}
+
+export async function deleteAccount(formData: FormData): Promise<void> {
+  const token = await tokenOr("/account/data");
+  try { await api("/v1/me/deletion", { method: "POST", token, body: { confirmation: String(formData.get("confirmation") ?? "") } }); }
+  catch (e) { back("/account/data", { error: (e as Error).message }); }
+  await clearSessionCookie();
+  redirect("/account/signin");
 }

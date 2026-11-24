@@ -4,12 +4,14 @@ import { Check, X } from "lucide-react";
 import { AnimatePresence, m as motion } from "motion/react";
 import { Dialog } from "radix-ui";
 import { text } from "@/lib/placeholder";
-import { compareRows, plans } from "./plans";
+import { comparison, displayPlans } from "./plans";
+import type { PlanCatalog } from "@/lib/catalog";
 
 const SPRING = { type: "spring", stiffness: 300, damping: 30 } as const;
 
 /** "Compare all features" (§7.7) — loaded the first time it's opened. */
-export default function CompareDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
+export default function CompareDialog({ open, onOpenChange, catalog }: { open: boolean; onOpenChange: (o: boolean) => void; catalog: PlanCatalog }) {
+  const plans = displayPlans(catalog), compareRows = comparison(catalog);
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <AnimatePresence>

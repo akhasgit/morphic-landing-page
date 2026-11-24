@@ -9,9 +9,10 @@ const accountUrl = "/account";
 export const site = {
   name: "Morphic",
   tagline: "Tell any website how to look.",
-  url: "{{https://YOUR_DOMAIN}}",
-  chromeStoreUrl: "{{CHROME_WEB_STORE_LISTING_URL}}",
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? "{{https://YOUR_DOMAIN}}",
+  chromeStoreUrl: process.env.NEXT_PUBLIC_CHROME_STORE_URL ?? "{{CHROME_WEB_STORE_LISTING_URL}}",
   accountUrl,
+  paidPlansEnabled: process.env.NEXT_PUBLIC_PAID_PLANS_ENABLED === "1",
   // Paid CTAs sign people in on the account page, then open Stripe Checkout (7-day trial, card collected up front).
   checkout: {
     pro: { monthly: `${accountUrl}/upgrade?plan=pro&interval=month`, yearly: `${accountUrl}/upgrade?plan=pro&interval=year` },
@@ -19,11 +20,11 @@ export const site = {
   },
   demoVideo: { src: "{{/video/morphic-demo.mp4}}", poster: "{{/video/morphic-demo-poster.jpg}}" },
   emailCaptureEndpoint: "{{FORM_OR_API_ENDPOINT}}",
-  uninstallFeedbackEndpoint: "{{FORM_OR_API_ENDPOINT}}",
-  supportEmail: "{{support@YOUR_DOMAIN}}",
-  legalEntity: "{{LEGAL_ENTITY_NAME}}",
+  uninstallFeedbackEndpoint: process.env.NEXT_PUBLIC_FEEDBACK_ENDPOINT ?? "{{FORM_OR_API_ENDPOINT}}",
+  supportEmail: process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "{{support@YOUR_DOMAIN}}",
+  legalEntity: process.env.NEXT_PUBLIC_LEGAL_ENTITY ?? "{{LEGAL_ENTITY_NAME}}",
   social: { x: "{{}}", productHunt: "{{}}", github: "{{}}" },
-  supportedBrowsers: "Chrome {{and Chromium browsers like Edge, Brave and Arc (verify)}}",
+  supportedBrowsers: "Chrome on desktop",
   socialProof: [] as { quote: string; name: string; role: string }[], // empty = hidden
   pricing: {
     free: { price: 0, morphs: "{{20}}", savedViews: "{{3}}" },
@@ -54,10 +55,10 @@ export const site = {
   },
 
   privacyLine:
-    "{{What page content and screenshots are sent to Morphic's servers, retention, and training use. (verify) — do not ship until accurate.}}",
+    "Morphic saves submitted commands and replies to your account. To answer a request, Morphic and its AI provider can process page content and screenshots.",
 
   // /welcome step 2. The extension has no keyboard command today, so the default is the toolbar icon.
-  openPanelHint: "{{Click the Morphic icon in your Chrome toolbar}}",
+  openPanelHint: "Click the Morphic icon in your Chrome toolbar",
 } as const;
 
 export type Site = typeof site;

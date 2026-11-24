@@ -9,7 +9,9 @@ export const ACCOUNT_PATH = "/account";
 
 /** The Morphic API server (MORPHIC_API_URL, e.g. https://api.example.com). */
 export function apiUrl(): string {
-  return (process.env.MORPHIC_API_URL ?? "http://localhost:8787").replace(/\/+$/, "");
+  const url = process.env.MORPHIC_API_URL;
+  if (process.env.NODE_ENV === "production" && (!url || !url.startsWith("https://"))) throw new Error("Set a production HTTPS MORPHIC_API_URL");
+  return (url ?? "http://localhost:8787").replace(/\/+$/, "");
 }
 
 export class ApiError extends Error {
@@ -66,7 +68,7 @@ export async function clearSessionCookie(): Promise<void> {
 /** Only account paths after sign-in (no open redirects). */
 export function safeNext(value: string | string[] | null | undefined): string {
   const next = Array.isArray(value) ? value[0] : value;
-  return next && next.startsWith(ACCOUNT_PATH) && !next.startsWith("//") ? next : ACCOUNT_PATH;
+  return next && (next === ACCOUNT_PATH || next.startsWith(`${ACCOUNT_PATH}/`)) && !next.startsWith("//") ? next : ACCOUNT_PATH;
 }
 
 export function signInPath(next: string): string {

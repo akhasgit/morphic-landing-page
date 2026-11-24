@@ -8,7 +8,7 @@ declare global {
     google?: {
       accounts: {
         id: {
-          initialize(options: { client_id: string; callback: (response: { credential: string }) => void; ux_mode?: "popup" | "redirect" }): void;
+          initialize(options: { client_id: string; callback: (response: { credential: string }) => void; nonce?: string; ux_mode?: "popup" | "redirect" }): void;
           renderButton(element: HTMLElement, options: Record<string, unknown>): void;
         };
       };
@@ -23,7 +23,7 @@ export function SignInButtons({ googleClientId, devAuth, next }: { googleClientI
   const [status, setStatus] = useState<string | null>(null);
 
   const exchange = useCallback(
-    async (body: { idToken: string } | { dev: true }) => {
+    async (body: { idToken: string; nonce: string } | { dev: true }) => {
       setStatus("Signing you in…");
       const response = await fetch("/account/api/session", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       if (response.ok) {
@@ -38,8 +38,15 @@ export function SignInButtons({ googleClientId, devAuth, next }: { googleClientI
 
   useEffect(() => {
     if (!gisReady || !googleClientId || !buttonRef.current || !window.google) return;
-    window.google.accounts.id.initialize({ client_id: googleClientId, callback: (response) => void exchange({ idToken: response.credential }), ux_mode: "popup" });
-    window.google.accounts.id.renderButton(buttonRef.current, { theme: "outline", size: "large", text: "continue_with", shape: "pill", width: 300 });
+    let cancelled = false;
+    void fetch("/account/api/challenge", { method: "POST" }).then(async response => {
+      if (!response.ok) throw new Error("Sign-in is temporarily unavailable");
+      const { nonce } = await response.json() as { nonce: string };
+      if (cancelled || !window.google || !buttonRef.current) return;
+      window.google.accounts.id.initialize({ client_id: googleClientId, nonce, callback: (response) => void exchange({ idToken: response.credential, nonce }), ux_mode: "popup" });
+      window.google.accounts.id.renderButton(buttonRef.current, { theme: "outline", size: "large", text: "continue_with", shape: "pill", width: 300 });
+    }).catch(e => { if (!cancelled) setStatus((e as Error).message); });
+    return () => { cancelled = true; };
   }, [gisReady, googleClientId, exchange]);
 
   return (

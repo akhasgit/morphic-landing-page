@@ -6,6 +6,8 @@ export type SubscriptionStatus = "free" | "trialing" | "active" | "past_due" | "
 export interface AccountInfo {
   user: { id: string; email: string; name: string };
   plan: PlanId;
+  subscriptionPlan?: PlanId;
+  testing?: { grantId: string; status: "active" | "expired" | "revoked" | "superseded"; expiresAt: number; morphLimit: number; morphsUsed: number; costLimitUsd: number; costUsedUsd: number } | null;
   status: SubscriptionStatus;
   interval: "month" | "year" | null;
   trialEndsAt: number | null;

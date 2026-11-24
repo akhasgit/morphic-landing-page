@@ -13,6 +13,8 @@ export function UninstallForm() {
   const [details, setDetails] = useState("");
   const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
 
+  if (!isSet(site.uninstallFeedbackEndpoint)) return <p className="mt-8">Feedback is welcome at <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a>. Uninstalling does not cancel a subscription; manage billing in your account.</p>;
+
   if (state === "done") {
     return (
       <div className="mt-8 flex max-w-[560px] items-center gap-3 rounded-2xl border border-line bg-white p-5 text-[16px]">
@@ -41,8 +43,7 @@ export function UninstallForm() {
             if (!res.ok) throw new Error(String(res.status));
           } else {
             // TODO(AK): set site.uninstallFeedbackEndpoint — until then feedback is only logged.
-            console.warn("site.uninstallFeedbackEndpoint is not set; feedback not sent.", { reason, details });
-            await new Promise((r) => setTimeout(r, 500));
+            throw new Error("Feedback is not configured yet. Please use the support link.");
           }
           setState("done");
         } catch {

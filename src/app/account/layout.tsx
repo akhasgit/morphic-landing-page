@@ -22,6 +22,8 @@ export default function AccountLayout({ children }: { children: ReactNode }) {
           <Link href="/account">Overview</Link>
           <Link href="/account/billing">Plan &amp; billing</Link>
           <Link href="/account/key">Anthropic key</Link>
+          <Link href="/account/history">History</Link>
+          <Link href="/account/data">Your data</Link>
         </nav>
       </header>
       <main className="acct-main">{children}</main>

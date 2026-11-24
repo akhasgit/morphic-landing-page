@@ -34,7 +34,7 @@ export default async function AccountOverview() {
         </div>
         <p className="acct-line">{statusLine(account)}</p>
         <Link href="/account/billing" className="acct-btn acct-btn-primary">
-          {account.plan === "free" ? (account.trialEligible ? "Try Pro free for 7 days" : "Upgrade") : "Manage plan & billing"}
+          {(account.subscriptionPlan ?? account.plan) === "free" ? "Plans and testing access" : "Manage plan & billing"}
         </Link>
       </section>
 

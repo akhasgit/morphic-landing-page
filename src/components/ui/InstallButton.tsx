@@ -79,7 +79,8 @@ export function InstallButton({ tile, size = "lg", variant = "primary", short, s
   const href = installUrl(tile);
   return (
     <a
-      href={href ?? "#"}
+      href={href ?? undefined}
+      aria-disabled={!href}
       className={`${cls} ${kind === "other" ? "group/tip" : ""}`}
       style={style}
       onPointerEnter={onPointerEnter}
@@ -93,7 +94,7 @@ export function InstallButton({ tile, size = "lg", variant = "primary", short, s
         }
       }}
     >
-      {label}
+      {href ? label : "Chrome listing coming soon"}
       {kind === "other" && (
         <span
           role="tooltip"

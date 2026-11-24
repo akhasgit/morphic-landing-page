@@ -1,27 +1,37 @@
-import { plans } from "@/components/tiles/pricing/plans";
+import { displayPlans } from "@/components/tiles/pricing/plans";
+import { usd, type PlanCatalog } from "@/lib/catalog";
+import { Confirmation } from "./Confirmation";
 import { planLabel, shortDate, statusLine } from "@/lib/account/format";
-import { getServerConfig, param, requireAccount } from "@/lib/account/server";
-import { openPortal, startCheckout } from "../actions";
+import { api, param, requireAccount } from "@/lib/account/server";
+import { openPortal, startCheckout, redeemCode } from "../actions";
 
 export default async function BillingPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
   const query = await searchParams;
   const { account } = await requireAccount("/account/billing");
-  const config = await getServerConfig();
-  const trialDays = config?.trialDays ?? 7;
+  const catalog = await api<PlanCatalog>("/v1/catalog").catch(() => null);
+  const trialDays = catalog?.trialDays ?? 0;
+  const plans = catalog ? displayPlans(catalog) : [];
   const checkout = param(query.checkout);
   const error = param(query.error);
-  const paying = account.plan !== "free";
+  const paying = (account.subscriptionPlan ?? account.plan) !== "free";
   const paid = plans.filter((p) => p.id !== "free");
 
   return (
     <>
       <h1 className="acct-h1">Plan &amp; billing</h1>
-      {checkout === "success" && (
-        <div className="acct-banner acct-banner-ok" role="status">
-          Thanks! Your plan updates within a few seconds — refresh this page if it hasn&rsquo;t yet. The extension picks it up automatically.
-        </div>
-      )}
-      {checkout === "cancelled" && <div className="acct-banner">Checkout was cancelled. Nothing was charged.</div>}
+      {param(query.redeemed) === "1" && <p className="acct-banner" role="status">Code checked. Your current access is shown below.</p>}
+      {account.testing?.status === "active" && !paying && <p className="acct-banner">{statusLine(account)} Starting a paid plan replaces testing access.</p>}
+      {!paying && <section className="acct-card">
+        <h2>Redeem testing access</h2>
+        <p className="acct-hint">30 days of Pro features, up to 200 morphs and $80 of hosted usage, subject to the testing group’s budget. No card required and no automatic charges.</p>
+        <form action={redeemCode}>
+          <label htmlFor="access-code">Access code</label>
+          <input id="access-code" name="code" required maxLength={64} autoComplete="off" className="acct-input" />
+          <button className="acct-btn acct-btn-primary" type="submit">Redeem code</button>
+        </form>
+      </section>}
+      {checkout === "success" && <Confirmation confirmed={paying && ["active", "trialing"].includes(account.status)} />}
+      {checkout === "cancelled" && <p className="acct-banner">Checkout closed. Your verified plan is shown below.</p>}
       {error && (
         <div className="acct-banner acct-banner-warn" role="alert">
           {error}
@@ -52,12 +62,12 @@ export default async function BillingPage({ searchParams }: { searchParams: Prom
         )}
       </section>
 
-      {!account.billingEnabled ? (
+      {!account.billingEnabled || !catalog ? (
         <p className="acct-banner">Paid plans aren&rsquo;t available yet.</p>
       ) : (
         <div className="acct-plans">
           {paid.map((plan) => {
-            const current = account.plan === plan.id;
+            const current = (account.subscriptionPlan ?? account.plan) === plan.id;
             return (
               <section key={plan.id} className={`acct-card acct-plan${current ? " current" : ""}`}>
                 <div className="acct-card-head">
@@ -65,7 +75,7 @@ export default async function BillingPage({ searchParams }: { searchParams: Prom
                   {current && <span className="acct-badge acct-badge-pro">Current</span>}
                 </div>
                 <p className="acct-price">
-                  <strong>${plan.monthly}</strong> / month · or ${plan.yearly} / year
+                  {plan.prices.map(price => `${usd(price.amountUsd)} / ${price.interval}`).join(" · ")}
                 </p>
                 <ul className="acct-list acct-includes">
                   {plan.includes.map((line) => (
@@ -74,12 +84,12 @@ export default async function BillingPage({ searchParams }: { searchParams: Prom
                 </ul>
                 {!paying && (
                   <div className="acct-plan-actions">
-                    {(["month", "year"] as const).map((interval) => (
+                    {plan.prices.map(({ interval }) => (
                       <form key={interval} action={startCheckout}>
                         <input type="hidden" name="plan" value={plan.id} />
                         <input type="hidden" name="interval" value={interval} />
                         <button className={`acct-btn${interval === "month" ? " acct-btn-primary" : ""}`} type="submit">
-                          {account.trialEligible ? `Try free for ${trialDays} days` : "Upgrade"} · {interval === "month" ? "monthly" : "yearly"}
+                          {account.trialEligible && trialDays > 0 ? `Try free for ${trialDays} days` : "Upgrade"} · {interval === "month" ? "monthly" : "yearly"}
                         </button>
                       </form>
                     ))}
@@ -90,7 +100,7 @@ export default async function BillingPage({ searchParams }: { searchParams: Prom
           })}
         </div>
       )}
-      {account.billingEnabled && account.trialEligible && !paying && (
+      {account.billingEnabled && account.trialEligible && trialDays > 0 && !paying && (
         <p className="acct-hint acct-center">
           Your first paid plan starts with a {trialDays}-day free trial. Checkout asks for your card, and it&rsquo;s charged when the trial ends unless you cancel before then.
         </p>

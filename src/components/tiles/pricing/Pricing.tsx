@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, m as motion } from "motion/react";
+import { m as motion } from "motion/react";
 import { Check } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
@@ -9,49 +9,13 @@ import { track } from "@/lib/analytics";
 import { cssVars } from "@/lib/css";
 import { useOnceTrue } from "@/lib/hooks";
 import { checkoutUrl, type Billing } from "@/lib/links";
-import { isSet } from "@/lib/placeholder";
 import { InstallButton } from "@/components/ui/InstallButton";
-import { Ph } from "@/components/ui/Ph";
-import { plans, type PlanId } from "./plans";
-
-const CompareDialog = dynamic(() => import("./CompareDialog"), { ssr: false });
+import { displayPlans, type PlanId } from "./plans";
+import { usd, type PlanCatalog } from "@/lib/catalog";
 
 const SPRING = { type: "spring", stiffness: 300, damping: 30 } as const;
 
-/** Prices change with a vertical digit roll (§7.7). */
-function RollingPrice({ value }: { value: number }) {
-  const digits = String(value).split("");
-  return (
-    <span className="roll">
-      <span className="sr-only">${value}</span>
-      <span aria-hidden="true">$</span>
-      <span className="roll-digits" aria-hidden="true">
-        <AnimatePresence initial={false} mode="popLayout">
-          {digits.map((d, i) => {
-            const place = digits.length - i; // key by place value so units persist
-            return (
-              <motion.span
-                key={place}
-                className="roll-col"
-                layout
-                initial={{ opacity: 0, width: 0 }}
-                animate={{ opacity: 1, width: "auto" }}
-                exit={{ opacity: 0, width: 0 }}
-                transition={SPRING}
-              >
-                <motion.span className="roll-strip" initial={false} animate={{ y: `${-Number(d) * 10}%` }} transition={SPRING}>
-                  {Array.from({ length: 10 }, (_, n) => (
-                    <span key={n}>{n}</span>
-                  ))}
-                </motion.span>
-              </motion.span>
-            );
-          })}
-        </AnimatePresence>
-      </span>
-    </span>
-  );
-}
+const CompareDialog = dynamic(() => import("./CompareDialog"), { ssr: false });
 
 function PaidCta({ plan, billing, label, dark }: { plan: "pro" | "power"; billing: Billing; label: string; dark?: boolean }) {
   const href = checkoutUrl(plan, billing);
@@ -71,7 +35,7 @@ function PaidCta({ plan, billing, label, dark }: { plan: "pro" | "power"; billin
           }
         }}
       >
-        {label}
+        {href ? label : "Paid plans coming soon"}
       </a>
       {inExtension && <p className="plan-note">Install, then upgrade in Settings</p>}
     </>
@@ -79,6 +43,14 @@ function PaidCta({ plan, billing, label, dark }: { plan: "pro" | "power"; billin
 }
 
 export function Pricing() {
+  const [catalog, setCatalog] = useState<PlanCatalog | null>(null);
+  const [unavailable, setUnavailable] = useState(false);
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch("/api/catalog", { signal: controller.signal }).then(r => { if (!r.ok) throw new Error("unavailable"); return r.json(); }).then(setCatalog).catch(() => { if (!controller.signal.aborted) setUnavailable(true); });
+    return () => controller.abort();
+  }, []);
+  const plans = catalog ? displayPlans(catalog) : [];
   const [billing, setBilling] = useState<Billing>("monthly");
   const [compare, setCompare] = useState(false);
   const compareLoaded = useOnceTrue(compare);
@@ -94,6 +66,7 @@ export function Pricing() {
 
   return (
     <div className="pr">
+      {!catalog && <p role="status">{unavailable ? "Pricing is temporarily unavailable. Please try again later." : "Loading current plans…"}</p>}
       <div className="pr-toggle reveal" style={cssVars({ i: 3 })} role="radiogroup" aria-label="Billing period">
         {(["monthly", "yearly"] as const).map((b) => (
           <button
@@ -110,7 +83,7 @@ export function Pricing() {
           >
             {billing === b && <motion.span layoutId="billing-pill" className="pr-toggle-pill" transition={SPRING} />}
             <span className="relative">{b === "monthly" ? "Monthly" : "Yearly"}</span>
-            {b === "yearly" && <span className="pr-save">2 months free</span>}
+
           </button>
         ))}
       </div>
@@ -125,17 +98,17 @@ export function Pricing() {
               <h3 className="plan-name">{p.name}</h3>
               <p className="plan-line">{p.line}</p>
               <div className="plan-price">
-                <RollingPrice value={price} />
+                <span>{price === null ? "Unavailable" : usd(price)}</span>
                 <span className="plan-per">{billing === "monthly" ? "/mo" : "/yr"}</span>
               </div>
               <p className="plan-sub">
-                {p.id === "free" ? "Free plan · No credit card" : billing === "yearly" ? `$${Math.round(price / 12)}/mo, billed yearly` : "Billed monthly · cancel anytime"}
+                {p.id === "free" ? "Free plan · No credit card" : price === null ? "Check back later" : billing === "yearly" ? `${usd(price / 12)}/mo equivalent, billed yearly` : "Billed monthly · cancel anytime"}
               </p>
               <div className="plan-cta">
                 {p.id === "free" ? (
                   <InstallButton tile="pricing-free" size="md" variant="ghost" short className="w-full" />
                 ) : (
-                  <PaidCta plan={p.id as Exclude<PlanId, "free">} billing={billing} label={p.cta} dark={pro} />
+                  price === null ? <span>Plan unavailable</span> : <PaidCta plan={p.id as Exclude<PlanId, "free">} billing={billing} label={p.cta} dark={pro} />
                 )}
               </div>
               <ul className="plan-includes">
@@ -155,19 +128,14 @@ export function Pricing() {
           Compare all features
         </button>
         <span className="pr-trust">
-          Cancel anytime · Secure checkout by <Ph value={site.pricingCopy.checkoutProvider} /> · <Ph value={site.pricingCopy.guarantee} />
+          Cancel anytime · Secure checkout by Stripe · Card required for paid plans
         </span>
-        <span className="pr-team">
-          Need it for a team?{" "}
-          <a href={isSet(site.pricingCopy.teamHref) ? site.pricingCopy.teamHref : "#"} className="pr-team-link">
-            <Ph value={site.pricingCopy.teamCta} />
-          </a>
-        </span>
+
       </div>
 
       {site.socialProof.length > 0 && <Marquee />}
 
-      {compareLoaded && <CompareDialog open={compare} onOpenChange={setCompare} />}
+      {compareLoaded && catalog && <CompareDialog open={compare} onOpenChange={setCompare} catalog={catalog} />}
     </div>
   );
 }

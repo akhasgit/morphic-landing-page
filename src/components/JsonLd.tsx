@@ -1,16 +1,10 @@
 import { faq } from "@/config/faq";
 import { site } from "@/config/site";
-import { num, text } from "@/lib/placeholder";
+import { text } from "@/lib/placeholder";
 
 /** SoftwareApplication (BrowserApplication) + FAQPage structured data (§7.8, §13). */
 export function JsonLd() {
-  const offers = [
-    { name: "Free", price: 0 },
-    { name: "Pro (monthly)", price: num(site.pricing.pro.monthly) },
-    { name: "Pro (yearly)", price: num(site.pricing.pro.yearly) },
-    { name: "Power (monthly)", price: num(site.pricing.power.monthly) },
-    { name: "Power (yearly)", price: num(site.pricing.power.yearly) },
-  ].map((o) => ({ "@type": "Offer", name: o.name, price: String(o.price), priceCurrency: "USD" }));
+  const offers = [{ "@type": "Offer", name: "Free", price: "0", priceCurrency: "USD" }];
 
   const data = [
     {

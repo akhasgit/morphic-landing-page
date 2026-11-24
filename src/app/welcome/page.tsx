@@ -20,7 +20,7 @@ export default function WelcomePage() {
     <PageShell cta={false} background={<PageField />}>
       <p className="eyebrow">Welcome</p>
       <h1 className="page-h1 mt-4">You&rsquo;re in. Let&rsquo;s make your first morph.</h1>
-      <p className="page-lead">Three steps, under a minute.</p>
+      <p className="page-lead">Pin Morphic, sign in, and try your first prompt.</p>
 
       <ol className="wl-steps">
         <li className="wl-step">
@@ -50,7 +50,7 @@ export default function WelcomePage() {
           <span className="wl-num">3</span>
           <div>
             <h2 className="wl-title">Try it on a starter page</h2>
-            <p className="wl-text">Open one of these pages, copy its prompt, and paste it into the panel.</p>
+            <p className="wl-text">First sign in with Google from the side panel. Then open a starter page, copy its prompt, and paste it into Morphic. Testers can redeem their access code in Settings → Account. Submitted commands and replies are saved to your account.</p>
           </div>
           <StarterCards />
         </li>

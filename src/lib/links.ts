@@ -19,6 +19,7 @@ export type Billing = "monthly" | "yearly";
 
 /** Paid CTAs: checkout URL, or the store when upgrading happens inside the extension. */
 export function checkoutUrl(plan: Plan, billing: Billing): string | null {
+  if (!site.paidPlansEnabled || !isSet(site.chromeStoreUrl)) return null;
   if (site.upgradeFlow === "in-extension") return installUrl(`pricing-${plan}`);
   const url = site.checkout[plan][billing];
   return isSet(url) ? url : null;

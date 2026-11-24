@@ -8,11 +8,11 @@ export const faq: { q: string; a: string }[] = [
   },
   {
     q: "Which websites does it work on?",
-    a: "Most sites where content is on the page: feeds, search results, listings, dashboards, articles. Content drawn in a canvas or locked in some embeds can't be read. {{Known limitations (verify)}}",
+    a: "Most sites where content is on the page: feeds, search results, listings, dashboards, articles. Content drawn in a canvas or locked in some embeds can be unavailable.",
   },
   {
     q: "Does it ever make things up?",
-    a: "No. Everything comes from the page through an extractor, and a QA agent checks the result against that data.",
+    a: "Morphic builds views from data it reads on the page. AI-generated labels, summaries and selections can contain errors. You can compare a view with the original page at any time.",
   },
   {
     q: "Can it click things for me? Is that safe?",
@@ -20,7 +20,7 @@ export const faq: { q: string; a: string }[] = [
   },
   {
     q: "What data does Morphic see and send?",
-    a: "{{From the privacy policy (verify)}}",
+    a: site.privacyLine,
   },
   {
     q: "What happens when a site changes its design?",
@@ -32,6 +32,6 @@ export const faq: { q: string; a: string }[] = [
   },
   {
     q: "Which browsers are supported? Can I cancel?",
-    a: `${site.supportedBrowsers} on desktop. Plans cancel anytime. {{refund details}}`,
+    a: `${site.supportedBrowsers}. You can update your card or cancel your paid subscription in Manage billing.`,
   },
 ];

@@ -15,6 +15,7 @@ function daysLeft(ms: number): string {
 
 /** One line about the plan: trial days, renewal, end date, or a past plan. Same wording as the extension. */
 export function statusLine(account: AccountInfo): string {
+  if (account.testing?.status === "active" && (account.subscriptionPlan ?? "free") === "free") return `Pro testing access · $0 · ends ${shortDate(account.testing.expiresAt)}. No automatic charge.`;
   const name = planLabel(account.plan);
   if (account.status === "trialing" && account.trialEndsAt) return `${name} trial · ${daysLeft(account.trialEndsAt)} (first charge ${shortDate(account.trialEndsAt)})`;
   if (account.plan !== "free" && account.cancelAtPeriodEnd && account.periodEnd) return `${name} until ${shortDate(account.periodEnd)}`;
